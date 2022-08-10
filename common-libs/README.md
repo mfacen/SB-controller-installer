@@ -1,5 +1,5 @@
 # Common libs
-
+git subtree pull --prefix common-libs common-libs develop --squash
 
 
 ## Getting started
