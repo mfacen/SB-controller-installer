@@ -1,5 +1,5 @@
 
-#include "../../SharpBox/include/header.h"
+#include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "1.25"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -56,7 +56,7 @@ Clarificador clarificadorInf("Clarificador Inf", "ci", &RelayClarInf, &evClarInf
 Speed_Control spdSup("Speed Ctrl Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 Speed_Control spdInf("Speed Ctrl Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
 
-#include "../../SharpBox/include/footer.h"
+#include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");
