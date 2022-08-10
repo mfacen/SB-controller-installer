@@ -96,7 +96,7 @@ void postTransmission()
 
 String mqttServer = "192.168.1.115";
 #include "classes.h"
-#include "../../SharpBox/include/declarations.h"
+#include "declarations.h"
 //#include "ESP8266FtpServer.h"
 //#include <PubSubClient.h>
 #include "MQTT.h"
