@@ -1,0 +1,104 @@
+
+#include "../../SharpBox/include/header.h"
+
+#define DEVICE_NAME "relayBoardIn"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
+#define SOFT_VERSION "1.23"        //   Changed file system to LittleFS   CHECAR LINEA 311
+String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
+const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
+
+Page page("Shrimpbox Main Controller", "User interface");
+Updater updater(DEVICE_NAME, SOFT_VERSION);
+TimeLabel lblTime("lblTime", "");
+LabelFreeHeap lblFreeHeap("lblHeap", "this");
+Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
+Label lblVersion("lblVersion", "Device: " + String(DEVICE_NAME) + " - Ver: " + String(SOFT_VERSION));
+DirCapture dirCapture("dCapt", "/capturas");
+RS485Main serialCom(&page); // Esta es la #DEFINICION srlCtrlPin en todo el programa.
+//ModbusLed ledModbus ( 1 );
+//Set modLedSet ("Led","idLed",&ledModbus);
+ModbusRelay modbusRelay (1,1);
+Set relayModbus ("ee","_id",&modbusRelay);
+DigitalOutput evClarSup(13, "evCs", true); // VV
+DigitalOutput bombaClarSup(33, "rlyCs", true);
+DigitalOutput evClarInf(27, "evCs", true); // VV
+DigitalOutput bombaClarInf(32, "rlyCs", true);
+DigitalOutput bombaResiduosSup(26, "rlyRS", false);
+DigitalOutput bombaResiduosInf(25, "rlyRi", false);
+DigitalOutput SkmSup(15, "rlysks", false);
+DigitalOutput SkmInf(14, "rlyski", false);
+
+Set skimmer_sup("Skimmer Sup", "skmSup", &SkmSup);
+Set skimmer_inf("Skimmer Inf", "skmInf", &SkmInf);
+
+GenericTimer residuosSup("Residuos Sup", "rs", &bombaResiduosSup);
+GenericTimer residuosInf("Residuos Inf", "ri", &bombaResiduosInf);
+
+Clarificador clarificadorSup("Clarificador Sup", "cs", &bombaClarSup, &evClarSup, &logger);
+Clarificador clarificadorInf("Clarificador Inf", "ci", &bombaClarInf, &evClarInf, &logger);
+
+
+#include "../../SharpBox/include/footer.h"
+
+// Button btnWifi("switchToStation","WiFi");
+// Graphic graphic("tempGraph");
+///////////////////////////////////////////////////////////////////////////
+////                                                               ////////
+///////              SETUP                                          ////////
+////                                                               ////////
+///////////////////////////////////////////////////////////////////////////
+
+void setup()
+{
+    startUpWifi();
+    SerialInterface.begin(9600, SERIAL_8N1, 16, 17);
+    node.begin(1,SerialInterface);
+    savedVariable::init();
+    page.addElement(&lblTime);
+    page.addString("<p>"
+                   "<a href=/settings>Preferencias</a>"
+                   "</p>"
+                    "<div><div class='divMain'><h3>Tanque Superior</h3><br>");
+    //page.addElement(&modLedSet);
+    page.addString("<div class=' card'>");
+    page.addElement(&relayModbus);
+    page.addElement(&clarificadorSup);
+    page.addElement(&residuosSup);
+    page.addElement(&skimmer_sup);
+    page.addElement(&clarificadorInf);
+    page.addElement(&residuosInf);
+    page.addElement(&skimmer_inf);
+
+    page.addString("</div>");
+    page.addElement(&logger);
+    page.addElement(&dirCapture);
+
+    // page.addElement(&graphic);
+    page.addString("<br>");
+    page.addElement(&lblFreeHeap);
+    page.addElement(&lblVersion);
+    // page.addElement(&btnWifi);
+
+    page.setDebug(true); //
+
+    Serial.println("page.getHTML()");
+
+    page.getHtml(); // Generate the index.html File
+    Serial.println("Generated index.html");
+    updater.checkUpdate();
+}
+
+///////////////////////////////////////////////////////////////////////////
+////                                                               ////////
+///////              LOOP                                          ////////
+////                                                               ////////
+///////////////////////////////////////////////////////////////////////////
+unsigned long lastCheck;
+void loop()
+{
+    generalLoop();
+    if (millis() - lastCheck > 2000)
+    {
+        //serialCom.requestData("spd_supmbar");
+        lastCheck = millis();
+    }
+}
