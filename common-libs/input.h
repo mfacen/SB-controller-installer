@@ -20,7 +20,7 @@
 #include <DallasTemperature.h>
 #include <Adafruit_Sensor.h>
 // class ElementsHtml;
-#include <hardwareInput.h>
+#include "hardwareInput.h"
 
 class Input : public ElementsHtml, Subject
 {

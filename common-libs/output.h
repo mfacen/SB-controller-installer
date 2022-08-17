@@ -15,6 +15,8 @@ public:
   virtual void update();
   virtual void update(float f);
 };
+
+
 class FakeOutput: public HardwareOutput
 {
   void update(){}

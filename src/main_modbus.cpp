@@ -17,27 +17,32 @@ DirCapture dirCapture("dCapt", "/capturas");
 //ModbusLed ledModbus ( 1 );
 //ModbusRelay (1,1);
 //Set modLedSet ("Led","idLed",&ledModbus);
-ModbusRelay relayVenturiSup(1,1);
-ModbusRelay relayVenturiInf(1,2);
-ModbusRelay relayResiduosSup(1,3);
-ModbusRelay relayResiduosInf(1,4);
-ModbusRelay evClarSup(1,5);
-ModbusRelay evClarInf(1,6);
-ModbusRelay RelayClarSup(1,7);
-ModbusRelay RelayClarInf(1,8);
-ModbusRelay SkmSup(1,9);
-ModbusRelay SkmInf(1,10);
-ModbusRelay RelayBlowerSup(1,11);
-ModbusRelay RelayBlowerInf(1,12);
-ModbusRelay RelayFeederFeedSup(1,13);
-ModbusRelay RelayFeederFeedInf(1,14);
-ModbusRelay RelayFeederAirSup(1,15);
-ModbusRelay RelayFeederAirInf(1,16);
+ModbusRelay RelayBlowerSup(1,1);
+ModbusRelay relayResiduosSup(1,2);
+ModbusRelay RelayClarSup(1,3);
+ModbusRelay evClarSup(1,4);
+ModbusRelay SkmSup(1,5);
+ModbusRelay RelayFeederAirSup(1,6);
+ModbusRelay RelayFeederFeedSup(1,7);
+ModbusRelay relayLucesSup(1,8);
+
+ModbusRelay RelayBlowerInf(1,9);
+ModbusRelay relayResiduosInf(1,10);
+ModbusRelay RelayClarInf(1,11);
+ModbusRelay evClarInf(1,12);
+ModbusRelay SkmInf(1,13);
+ModbusRelay RelayFeederAirInf(1,14);
+ModbusRelay RelayFeederFeedInf(1,15);
+ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
-ModbusVFD spdSupCtrl( 4) ;
+ModbusVFD spdSupCtrl( 2) ;
 ModbusVFD spdInfCtrl( 3) ;
-Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
-AnalogIn pressureSensorInf (A3);//  y se va a referir a numeros del esp8266 a travez del modbus
+Set vfdSup ("Venturi SUp","vfdSup",&spdSupCtrl);
+Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
+//Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
+//  y se va a referir a numeros del esp8266 a travez del modbus
+AnalogIn pressureSensorInf (36);
+AnalogIn pressureSensorSup (39);
 
 Set switchBlowerSup("Blower", "bls", &RelayBlowerSup);
 Set switchBlowerInf("Blower", "bls", &RelayBlowerInf);
@@ -50,6 +55,10 @@ Feeder feederInf("Alimentador Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFe
 
 GenericTimer residuosSup("Residuos Sup", "rs", &relayResiduosSup);
 GenericTimer residuosInf("Residuos Inf", "ri", &relayResiduosInf);
+
+GenericTimer lucesSup("Luces Sup", "ls", &relayLucesSup);
+GenericTimer lucesInf("Luces Inf", "li", &relayLucesInf);
+
 Clarificador clarificadorSup("Clarificador Sup", "cs", &RelayClarSup, &evClarSup, &logger);
 Clarificador clarificadorInf("Clarificador Inf", "ci", &RelayClarInf, &evClarInf, &logger);
 
@@ -77,6 +86,8 @@ void setup()
     spdSup.init();
     logger.addInput(&clarificadorInf);
     page.addElement(&lblTime);
+    page.addElement(&vfdSup);
+    page.addElement(&vfdInf);
     page.addString("<p>"
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
