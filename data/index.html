@@ -1,0 +1,18 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"> <link rel="stylesheet" type="text/css" href="index_files/style.css"><script src="index_files/Chart.js"></script><script src="index_files/moment.js"></script><meta name="viewport" content="width=device-width, initial-scale=1.0"><style type="text/css">/* Chart.js */
+@keyframes chartjs-render-animation{from{opacity:.99}to{opacity:1}}.chartjs-render-monitor{animation:chartjs-render-animation 1ms}.chartjs-size-monitor,.chartjs-size-monitor-expand,.chartjs-size-monitor-shrink{position:absolute;direction:ltr;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1}.chartjs-size-monitor-expand>div{position:absolute;width:1000000px;height:1000000px;left:0;top:0}.chartjs-size-monitor-shrink>div{position:absolute;width:200%;height:200%;left:0;top:0}</style></head><body>
+<h1>Flexibox</h1><h3>The ultimate device.</h3><nav><a href="http://192.168.0.103/edit.html">Upload </a><a href="http://192.168.0.103/dataLog.csv">dataLog</a><a href="http://192.168.0.103/delete?file=/dataLog.csv">delete</a><a href="http://192.168.0.103/settings">Preferencias </a><a href="http://192.168.0.103/list?dir=/">Directory</a><a href="http://192.168.0.103/graphic.html">graphic</a></nav>
+<span id="lbl1">Label One</span>
+<button type="button" width="40" id="btnSnap" value="Snap" onclick="btnClickText('btnSnap',this.value)">Snap</button>
+
+<button type="button" width="40" id="btnSleep" value="Sleep" onclick="btnClickText('btnSleep',this.value)">Sleep</button>
+
+<span id="lblHeap">Heap: 30552 Frag: 4%</span>
+ <div id="VccIn"><h4>Battery</h4>VIN<br><span id="VccInlbl">30.50</span>Volts / 10</div>
+ <div><h4>Temp</h4>Dsb18B20<br><span id="lblTemp">33.38</span></div>
+<div class="Logger" id="Logger"><h4>Logger</h4><select id="comboLogger" onchange="btnClickText('comboLogger', this.selectedIndex)">
+<option value="OFF" selected="selected">OFF</option><option value="ON">ON</option></select><input type="number" id="edtLogger" onchange="btnClickText('edtLogger',(this.value))"><br>Inputs:<br><ul><li>Temp</li><li>Battery</li></ul><span id="lblLogger">Tmr: 3</span></div>
+<div id="wrapper" style="position:relative;"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div><canvas id="canvasGraphic" style="display: block; width: 1530px; height: 765px;" width="1530" height="765" class="chartjs-render-monitor"></canvas></div><button onclick="btnClickedPlus()">+</button><button onclick="btnClickedMinus()">-</button><button onclick="btnClickedForward()">&gt;&gt;</button><button onclick="btnClickedBackward()">&lt;&lt;</button>
+<br><span id="errorLabel"></span><br>
+<button type="button" datavalue="primus,2323" onclick="btnClick(this)" id="switchToStation">Connectar WIFI</button><br>Total KB: 934.88Kb / Used: 240.95 Page Size: 4<script>
+</script><script src="index_files/javascript.js"></script></body></html>

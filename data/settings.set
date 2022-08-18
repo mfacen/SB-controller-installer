@@ -1,0 +1,8 @@
+name,flexibox
+uploadInterval,3600
+secondsCapture,60
+wifi_ssid,INFINITUM3284_2.4
+wifi_pass,espantasuegras
+serverName,192.168.1.115
+mqttServer,192.168.1.115
+mqttTopic,noTopic

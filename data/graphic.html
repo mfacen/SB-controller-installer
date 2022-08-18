@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP8266 Humidity Logger</title>
+    <link rel="stylesheet" type="text/css" href="style_graphic.css">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+    <script src="moment.min.js"></script>
+    <script  src="Chart.min.js"></script>
+
+</head>
+
+<body>
+ 	<header>
+		<nav class="center">
+			<a href="index.html">Inicio</a>
+			<a href="calibration.html">Calibracion</a>
+			<a href="settings">Preferencias</a>
+			<a href="graphic.html">Grafico</a>
+			<a href="estimaciones.html">Biometrias</a>
+
+		</nav>
+	</header>
+    <center>
+   
+       
+             <div id="wrapper" style="position:relative;">
+                <canvas id="canvasGraphic" padding="50" >No canvas in your browser...sorry...</canvas>
+             </div>
+             <div id='buttons'>
+				<button onclick=btnClickedCropBegining()>Trim</button>
+             	<button onclick=btnClickedPlus()>+</button>
+             	<button onclick=btnClickedMinus()>-</button>
+             	<button onclick=btnClickedForward()>>></button>
+             	<button onclick=btnClickedBackward()><<</button>
+             	<button onclick=btnClickedCropEnd()>Trim</button>
+             </div>
+<script>
+    var timeFormat = 'MM/DD/YYYY HH:mm';
+    var color = Chart.helpers.color;
+       				//var ctx = document.getElementById('canvasGraphic').getContext('2d');
+
+	var config = {
+			type: 'line',
+			//minHeight: 400,
+			data: {
+				labels: [ // Date Objects
+					
+				],
+				datasets: [{
+					label: 'Relay',
+					backgroundColor: color("blue").alpha(0.5).rgbString(),
+					borderColor: color("green").alpha(1).rgbString(),
+					fill: false,
+					showLine: true,
+					data: [
+					],
+				}]
+			},
+			options: {
+				title: {
+					text: 'Datos Historicos',
+					display: true,
+					fontSize: 16
+				},
+				layout: {
+					padding: 50
+				},
+				maintainAspectRatio: true,
+				scales: {
+					xAxes: [{
+						type: 'time',
+						//distribution: 'linear',
+						display: 'true',
+						time: {
+							parser: timeFormat,
+							// unit: 'day',
+							tooltipFormat: 'll HH:mm',
+							//min: new Date("2019-05-20")
+						},
+						scaleLabel: {
+							display: true,
+							labelString: 'Date'
+						},
+						offset: true,
+						scaleBeginAtZero: false,
+					}],
+					yAxes: [{
+						scaleLabel: {
+							display: true,
+							labelString: 'value',
+						}
+					}]
+				},
+			}
+		};
+
+var myChart;
+
+//var datos = parseCSV("time,relay,temp,analog\n11111111,0,20,7\n11111122,0,21,7.5\n11111133,0,22.5,8\n");
+
+const $_GET = {};
+const args = location.search.substr(1).split(/&/);
+for (let i=0; i<args.length; ++i) {
+    const tmp = args[i].split(/=/);
+    if (tmp[0] != "") {
+        $_GET[decodeURIComponent(tmp[0])] = decodeURIComponent(tmp.slice(1).join("").replace("+", " "));
+        console.log(`>>${$_GET['hola']}`);
+    }//::END if
+}//::END for
+
+window.onload = function() {
+			var ctx = document.getElementById('canvasGraphic').getContext('2d');
+			window.myChart = new Chart(ctx, config);
+			data=loadCSV();
+		};
+
+
+function loadCSV() {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && ( this.status == 200  || this.status == 404 ) ) {
+			dataArray = parseCSV(this.responseText);
+						window.myChart.update();
+
+			return dataArray;
+
+		}
+	};
+	xmlhttp.open("GET", $_GET['file'], true);
+	xmlhttp.send();
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+function parseCSV(string,linesLimit=1000000) {
+	var array = [];
+	var items = [];
+	var colors=['cyan','red','green','blue','magenta','lightgray','purple','orange'];
+	var lines = string.split("\n");
+	var titles = lines[0].split(",");
+	var loopStart = 1;
+	if (titles.length > linesLimit ) loopStart = titles.length - linesLimit;
+	 for ( var i=loopStart; i<titles.length; i++) { 
+	 	config.data.datasets[i-1] = [];
+	 	config.data.datasets[i-1].data=[];
+	 	config.data.datasets[i-1].backgroundColor=color(colors[i%7]).alpha(0.5).rgbString();
+		config.data.datasets[i-1].borderColor=color(colors[i%7]).alpha(0.5).rgbString();
+		config.data.datasets[i-1].datafill= false;
+	 	config.data.datasets[i-1].label = titles[i];
+	 	}
+	//config.data.labels = titles;
+	for (var i = 1; i < lines.length; i++) {
+		var data = lines[i].split(",");
+		var offset = new Date().getTimezoneOffset();
+		console.log(offset);
+		config.data.labels.push(new Date(data[0]*1000+60*offset)); // add 5 hours for time zone, this should be automatic
+		for ( var j=1; j<data.length; j++ ) {
+				config.data.datasets[j-1].data.push(data[j]);
+			}
+			//console.log(config.data.datasets[0].data);
+				//array.push(items[i]);
+				
+	}
+				// config.data.datasets[0].data =(data1);
+				// config.data.datasets[1].data =(data2);
+				// config.data.datasets[2].data = (data3);
+			//	config.data.labels=data0;
+				config.options.scales.xAxes[0].time.min = config.data.labels[0];
+				console.log(array);
+					return array;
+
+}
+
+
+ 
+ function btnClickedPlus(){
+ 						var span = calculateDataSpan(); console.log(span);
+ 						config.options.scales.xAxes[0].time.min = moment(config.options.scales.xAxes[0].time.min).add(( span/10));
+						config.options.scales.xAxes[0].time.max = moment(config.options.scales.xAxes[0].time.max).subtract(( span/10));
+						window.myChart.update(); }
+ function btnClickedMinus(){
+ 	 						var span = calculateDataSpan(); console.log(span);
+ 							config.options.scales.xAxes[0].time.min = moment(config.options.scales.xAxes[0].time.min).subtract( span/10);
+  							config.options.scales.xAxes[0].time.max = moment(config.options.scales.xAxes[0].time.max).add( span/10);
+							window.myChart.update(); }
+ function btnClickedForward(){
+ 	 						var span = calculateDataSpan(); console.log(span);
+ 							config.options.scales.xAxes[0].time.min = moment(config.options.scales.xAxes[0].time.min).add( span/10);
+ 							config.options.scales.xAxes[0].time.max = moment(config.options.scales.xAxes[0].time.max).add( span/10);
+							 window.myChart.update(); }
+ function btnClickedBackward(){
+ 	 						var span = calculateDataSpan(); console.log(span);
+ 							config.options.scales.xAxes[0].time.min = moment(config.options.scales.xAxes[0].time.min).subtract( span/10);
+ 							config.options.scales.xAxes[0].time.max = moment(config.options.scales.xAxes[0].time.max).subtract( span/10);
+							 window.myChart.update(); }
+function btnClickedCropEnd(){
+							config.data.labels.pop();
+							config.data.datasets.forEach(function(dataset, index) {
+        dataset.data.pop();
+    });
+							window.myChart.update();
+}function btnClickedCropBegining(){
+							config.data.labels.splice(0,1);
+							config.data.datasets.forEach(function(dataset, index) {
+        dataset.data.splice(0,1);
+	});
+					config.options.scales.xAxes[0].time.min = config.data.labels[0];
+
+							window.myChart.update();
+}
+function calculateDataSpan(){
+	return moment(config.options.scales.xAxes[0].time.max) - moment(config.options.scales.xAxes[0].time.min);
+}
+ 
+</script>
+
+    </center>
+
+
+
+    </style>
+</body>
+
+</html>
