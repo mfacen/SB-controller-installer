@@ -191,7 +191,7 @@ public:
             s+=id + "' ";
             s+=(value)?"checked":"";
              s+=" onchange=\"btnClickText('" + id + "',(this.checked))\"> " +
-            "<span class='toggle'></span></label> " + name;}
+            "<span class='toggle'></span></label> ";}//+ name;}
        //     { s= "<input type='checkbox' id='"+id+"' onchange=\"btnClickText('"+id+"',(this.value))\">";}
 
     else
@@ -527,24 +527,18 @@ public:
   }
 };
 
-class Dsb18B20 : public Input
+class Dsb18B20 : public HardwareInput
 {
 public:
   int pin;
   DallasTemperature *tempSensors;
   OneWire *oneWire;
 
-  Dsb18B20(int _pin, String _name, float _factor = 1)
+  Dsb18B20(int _pin)
   {
     pin = _pin;
-    name = _name;
-    factor = _factor;
-    id = _name;
-    unit = "&#8451;"; // html code for ^C
+   // unit = "&#8451;"; // html code for ^C
     // descriptor = "Dsb18B20";
-    label = new Label("lbl" + id, "0.00", this);
-    label->setStyle(" class='numInp' "); // hacel estos labels de una cierta class para poder cambiarlos desde CSS
-    pushElement(this);                   // Los elementos basicos se registran solos en el AllHTMLElemens !!
     pinMode(pin, INPUT_PULLUP);
     oneWire = new OneWire(pin);                   // Set up a OneWire instance to communicate with OneWire devices
     tempSensors = new DallasTemperature(oneWire); // Create an instance of the temperature sensor class
@@ -553,19 +547,6 @@ public:
   }
   //~Dsb18B20(ElementsHtml::deleteElement(this));
 
-  String getHtml()
-  {
-    String s = " <div class='card'";
-    s += style;
-    s += "><h4>";
-    s += name;
-    s += "</h4><br>";
-    s += label->getHtml();
-    s += "<br>";
-    s += unit;
-    s += "</div>";
-    return s;
-  }
 
   void update()
   {
@@ -581,9 +562,7 @@ public:
       //Serial.println(tempSensors->getDeviceCount());
       value = tempSensors->getTempCByIndex(0) * factor; // Get the temperature from the sensor
       tempRequested = false;
-      label->update(String(value, 1));
-      if (output)
-        output->update(value);
+      
       //Serial.println("temp"+String (value));
     }
     // value = tempSensors->getTempCByIndex(0);
@@ -595,10 +574,8 @@ public:
     tempSensors->requestTemperatures();
     return value = tempSensors->getTempCByIndex(0);
   }
-  String postCallBack(ElementsHtml *e, String postValue) { return ""; }
 
 private:
-  Label *label;
   bool tempRequested = false;
   unsigned long lastTemperatureRequest;
   int intervalTemperature = 1500;
@@ -643,9 +620,9 @@ public:
     float refRange = refHigh - refLow;
     float rawRange = rawHigh - rawLow;
     // if (rawRange == 0)  rawRange = .001;
-    if (rawRange != 0)
+    if (rawRange != 0 && refRange !=0 )
     {
-    //Serial.println("Calculating Calibration "+String(rawHigh)+":"+String(refHigh)+":"+String(rawRange));
+    Serial.println("Calculating Calibration "+String(rawHigh)+":"+String(refHigh)+":"+String(rawRange));
       return   ((((v - rawLow) * refRange) / rawRange) + refLow);
     }
     else
@@ -681,7 +658,10 @@ private:
   ButtonPrompt *btnCalLow;
   ButtonPrompt *btnCalHigh;
   ElementsHtml *child;
-  float refHigh, refLow, rawHigh, rawLow;
+  float refHigh = 0;
+  float  refLow=0;
+  float rawHigh=0;
+  float rawLow=0;
 };
 
 
@@ -884,7 +864,7 @@ public:
       firstRun = false;
       output->update(0);
       chkState->update();
-      running = chkState->getValue();
+      running = (bool) chkState->getValue();
     }
     if (running)
     {
@@ -926,7 +906,9 @@ public:
     }
     if (e == chkState)
     {
-      running = e->getValue();
+      Serial.println(postValue);
+      if (postValue=="1") running = true;
+      else {running = false;index=0;}
     }
     return "";
   }
@@ -977,6 +959,8 @@ public:
     input = h;
     label = new Label(id + "lbl", "", this);
     label->setStyle(" class='numInp'"); //   Esto lo hago desde el CSS es una clase
+    btnID = new ButtonPrompt((id + ("btnID")).c_str(), "Change ID", this);
+    columnName = new savedVariable (id+"Name");
     // pushElement(this);          // Los elementos basicos se registran solos en el AllHTMLElemens !!
     if (use_calibration)
       cal = new calibration_module(id + "Cal", this);
@@ -992,7 +976,8 @@ public:
     s += id;
     s += "'><h4>";
     s += name;
-    s += "</h4><br>";
+    s += "</h4>";
+    s+= btnID->getHtml();
     s += label->getHtml();
     s += "<br>";
     s += unit;
@@ -1005,15 +990,21 @@ public:
   }
   void update()
   {
+    if (firstRun){
+      firstRun = false;
+      columnName->update();
+      if (columnName->text!="") id=columnName->text;
+      else columnName->update(id);
+    }
     if (input)
     {
       input->update();
-      value = input->getValue();
-      cal!=NULL ? value = cal->calculate(input->value) : value = input->value;
-      Serial.println("Before AVG"+String(value));
-      //avg ? value = avg->addValue(input->value) : value = value; NO SE QUE PASA AQUI RESETEA
-      Serial.println("After AVG");
-      //Serial.println(value);
+      value = input->value;
+      //Serial.println("Before CAL"+String(value));
+      cal ? value = cal->calculate(value) : value = value;
+      //Serial.println("Before AVG"+String(value));
+      avg ? value = avg->addValue(value) : value = value;// NO SE QUE PASA AQUI RESETEA
+      //Serial.println("After AVG"+String(value));
     }
     label->update(value);
     // chart->update(value);
@@ -1031,7 +1022,10 @@ public:
   }
   String postCallBack(ElementsHtml *e, String postValue)
   {
-    //update();
+    if (e==btnID){
+      columnName->update(postValue);
+      id = columnName->text;
+    }
     return "";
   }
   float getSecondValue() { return input->getSecondValue(); }
@@ -1039,12 +1033,86 @@ public:
 
 private:
   Label *label;
+  ButtonPrompt *btnID;
   String unit = "";
+  savedVariable *columnName;
   HardwareInput *input;
   calibration_module *cal;
   AverageModule *avg;
   bool secondValueBool = false;
   // Chart *chart;
+};
+// ########################################
+//  GENERIC OUTPUT PANEL   LO PUSE EN EL INPUT PORQUE NECESITO SEPARAR LOS HEADERS
+// ########################################
+class GenericOutputPanel : public Output
+{
+
+public:
+  GenericOutputPanel( String _name, String _id, String _unit,HardwareOutput *out=NULL, bool inverted = false)
+  { /// Constructor
+    id = _id;
+    name = _name;
+    unit = _unit;
+    btnID = new ButtonPrompt((id + ("btnID")).c_str(), "Change ID", this);
+    columnName = new savedVariable (id+"Name");
+    label = new Label("lbl" + id,"text", this);
+    label->setStyle(" class='numInp' "); //   Esto lo hago desde el CSS es una clase
+    value=0;
+    invertedLogic = inverted;
+    output = out;
+  };
+  void update(){
+    if (firstRun){
+      firstRun = false;
+      columnName->update();
+      if (columnName->text!="") id=columnName->text;
+      else columnName->update(id);
+    }
+    label->update(value);
+    };
+  void update(String sss) { update(sss.toFloat()); };
+  void update(float _value)
+  {
+    //Serial.println("Updating "+id+" Value: " + String(_value));
+    value = _value;
+    if (output!=NULL) output->update(value);
+    label->update(value);
+  }
+
+  String getHtml()
+  {
+    String s = " <div class='card'";
+    s += style;
+    s += " id='";
+    s += id;
+    s += "'><h4>";
+    s += name;
+    s += "</h4>";
+    s+= btnID->getHtml();
+    s+="<br>";
+    s += label->getHtml();
+    s += "<br>";
+    s += unit;
+    s += "</div>";
+    return s;
+  }
+
+  String postCallBack(ElementsHtml *e, String postValue) { 
+    if (e==btnID){
+      columnName->update(postValue);
+      id = columnName->text;
+    }
+    
+    return ""; 
+          }
+
+private:
+  Label *label;
+  HardwareOutput *output;
+    ButtonPrompt *btnID;
+  savedVariable *columnName;
+
 };
 
 // ########################################

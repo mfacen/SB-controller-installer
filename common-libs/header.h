@@ -44,10 +44,15 @@
 #include <ModbusMaster.h>
 #include <ModbusSlave.h>
 
-ModbusMaster node;
-
+ModbusMaster nodeRelays;
+#ifdef ESP32
 #define MAX485_DE      4
 #define MAX485_RE_NEG  4
+#endif
+#ifdef ESP8266
+#define MAX485_DE      D2
+#define MAX485_RE_NEG  D2
+#endif
 void preTransmission()
 {
   digitalWrite(MAX485_RE_NEG, 1);
@@ -182,7 +187,7 @@ unsigned long lastNTPResponse = 0;
 unsigned long lastUpdateCheck = 0;
 unsigned long lastWifiCheck = 0;
 int updateCheckInterval = 600;
-int intervalWifiCheck = 600;
+int intervalWifiCheck = 600;   // AQUI CAMBIAR A 600
 unsigned long lastUdpSend = 0;
 int udpInterval = 10000;
 float batteryFactor = 1;

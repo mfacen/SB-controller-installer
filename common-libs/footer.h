@@ -17,40 +17,10 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
 #endif
 
 #define DEBUG_SERIAL Serial
-///////////////////////////////////////////////////////////////////////////
-////                                                               ////////
-///////             Start up Wifi                                  ////////
-////                                                               ////////
-///////////////////////////////////////////////////////////////////////////
 
-void startUpWifi()
-{
-#ifdef ESP8266
-    WiFiEventHandler wifiConnectHandler;
-    WiFiEventHandler wifiDisconnectHandler;
-    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-#endif
 
-    // wifi_set_opmode(STATION_MODE);
-    Serial.begin(115200); // Start the Serial communication to send messages to the computer
-    delay(10);
-    Serial.println("\r\n");
-
-    String ss = WiFi.macAddress();
-    Serial.println(ss);
-    ss.remove(0, 9);
-    ss.remove(2, 1);
-    ss.remove(4, 1);
-    mdnsName += ss;
-    // gdbstub_init();S
-
-    startSPIFFS(); // Start the SPIFFS and list all contents
-    // WiFi.begin(); //No es necesario
-    // WiFi.setAutoConnect(true);// Para que no use las credenciales guardadas en la memoria FLASH poner false
-    // WiFi.persistent(true);
-
-    int connectionStatus = WiFi.waitForConnectResult();
+void connectToWifi () {
+     int connectionStatus = WiFi.waitForConnectResult();
     // Serial.println(connectionStatus);
 
     if (connectionStatus == WL_CONNECTED)
@@ -95,6 +65,57 @@ void startUpWifi()
         myIP = WiFi.softAPIP();
     }
 
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        WiFi.hostByName(ntpServerName, timeServerIP); // Get the IP address of the NTP server
+        sendNTPpacket(timeServerIP);
+        WiFi.mode(WIFI_STA);
+        
+        // setSyncInterval(30);
+        // setSyncProvider(getTime);
+    }
+
+}
+///////////////////////////////////////////////////////////////////////////
+////                                                               ////////
+///////             Start up Wifi                                  ////////
+////                                                               ////////
+///////////////////////////////////////////////////////////////////////////
+void iddleTime(){
+    server.handleClient();
+}
+
+void startUpWifi()
+{
+#ifdef ESP8266
+    WiFiEventHandler wifiConnectHandler;
+    WiFiEventHandler wifiDisconnectHandler;
+    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+#endif
+
+    // wifi_set_opmode(STATION_MODE);
+    Serial.begin(115200); // Start the Serial communication to send messages to the computer
+    delay(10);
+    Serial.println("\r\n");
+
+    String ss = WiFi.macAddress();
+    Serial.println(ss);
+    ss.remove(0, 9);
+    ss.remove(2, 1);
+    ss.remove(4, 1);
+    mdnsName += ss;
+    // gdbstub_init();S
+
+    startSPIFFS(); // Start the SPIFFS and list all contents
+    // WiFi.begin(); //No es necesario
+    // WiFi.setAutoConnect(true);// Para que no use las credenciales guardadas en la memoria FLASH poner false
+    // WiFi.persistent(true);
+
+
+    connectToWifi();
+   
+
     // WiFi.setAutoReconnect(true);
     // WiFi.persistent(true);
     loadPreferences();
@@ -108,14 +129,7 @@ void startUpWifi()
     Serial.println("\e[1;31m\033[103mLocal Ip " + WiFi.localIP().toString() + "\u001b[0m");
     Serial.print("Time server IP:\t");
     Serial.println(timeServerIP);
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        WiFi.hostByName(ntpServerName, timeServerIP); // Get the IP address of the NTP server
-        sendNTPpacket(timeServerIP);
-        // setSyncInterval(30);
-        // setSyncProvider(getTime);
-    }
-
+    
     pinMode(SerialCtrlPin, OUTPUT);
 
     // sendNTPpacket(timeServerIP);
@@ -125,6 +139,9 @@ void startUpWifi()
     // webSocket.onEvent(webSocketEvent);
     // Serial.println("Autoreconnect = " + String(WiFi.getAutoReconnect()));
 #ifdef JELLY_NUEVO
+    Wire.begin(SDA, SCL); // Aqui setea los wire al default para usar el Jellyfish pero hay conflictos con otros WIRE
+#endif
+#ifdef JELLY_VIEJO
     Wire.begin(SDA, SCL); // Aqui setea los wire al default para usar el Jellyfish pero hay conflictos con otros WIRE
 #endif
     //rs485.begin (115200);
@@ -138,15 +155,16 @@ void startUpWifi()
   digitalWrite(MAX485_DE, 0);
 
   // Modbus communication runs at 9600 baud
+  #ifdef ESP32
   SerialInterface.begin(9600);
-
-  node.begin(SerialCtrlPin, SerialInterface);
+  #endif
+  nodeRelays.begin(SerialInterface);
   // Callbacks allow us to configure the RS485 transceiver correctly
-  node.preTransmission(preTransmission);
-  node.postTransmission(postTransmission);
+  nodeRelays.preTransmission(preTransmission);
+  nodeRelays.postTransmission(postTransmission);
+  nodeRelays.idle( &iddleTime);
 
 }
-
 void printJavaQueue(Page page)
 {
     String ss = page.getJavaQueue(); // Get the JavaScript Queue from page
@@ -286,7 +304,7 @@ void generalLoop()
         Serial.println("\033[34m\nSTART_OF_10_SEC_LOOP");
         // Serial.println("Heap Left: " + String(ESP.getFreeHeap(), DEC)); //+" :Frag: " +String(ESP.getHeapFragmentation(),DEC)+"   Max-SIze = "+ String(ESP.getMaxFreeBlockSize()));
         saveState("unixTime", String(now()));
-        if (timeStatus() == 0 && (WiFi.status() == WL_CONNECTED))
+        if (timeStatus() == timeNotSet && (WiFi.status() == WL_CONNECTED))
         {
             sendNTPpacket(timeServerIP);
             getTime();
@@ -302,19 +320,22 @@ void generalLoop()
         Serial.print("Wifi.status = ");
         Serial.println((WiFi.status() == 3) ? "Connected." : "Disconnected");
 
-        if (isConnected)
+        if (WiFi.status() == WL_CONNECTED)
             lastWifiCheck = now(); // si hay coneccion resetea el counter para el reset
+        if (now() - lastWifiCheck > intervalWifiCheck && lookUpSettings("wifi_ssid") != "")
+            {
+                Serial.println("Trying to connect to Wifi." + String(WiFi.getMode()));
+                lastWifiCheck = now();
+                connectToWifi();//    ESP.restart();
+            }   
+
         if ((now() - lastUpdateCheck) > updateCheckInterval)
         {
             if (WiFi.status() == WL_CONNECTED)
             {
                 updater.checkUpdate();
             }
-            else if (now() - lastWifiCheck > intervalWifiCheck && lookUpSettings("wifi_ssid") != "")
-            {
-                Serial.println("Resetting to try to connect." + String(WiFi.getMode()));
-            //    ESP.restart();
-            }                        // Por Ahora
+            //else                      // Por Ahora
             lastUpdateCheck = now(); // si esta en AP y hay SSID se resetea.
         }                            // No he podido hacer funcionar el AP y STA
         if (WiFi.status() == WL_CONNECTED)
@@ -1286,7 +1307,7 @@ void handleFileList()
                 Wire.beginTransmission(address); // transmit to device in Adress
                 Wire.print(command);
                 Wire.endTransmission();
-                Serial.println("Senttttttt msg to EZO: " + command);
+                Serial.println("Sent msg to EZO: address: " +String(address)+" command:"+ command);
 
                 delay(600); // let the EZO rest a little...
                 if (command != "Sleep")

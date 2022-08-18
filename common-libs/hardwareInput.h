@@ -24,13 +24,14 @@ public:
   AnalogIn(int _pin)
   {
     pin = _pin; 
+    
   }
   void update()
   {
     if (firstRun)
     {
       value = analogRead(pin);
-      //Serial.println("Reading analog pin value:"+String(value));
+      //Serial.println("Reading analog pin "+String(pin)+" value:"+String(value));
     }
   }
 
@@ -111,11 +112,21 @@ class RS485_Device: public HardwareOutput {
 // ########################################
 class Modbus_device: public HardwareInput {
   public:
-    Modbus_device () {
+    Modbus_device (int _slaveNumber,int _pinNumber) {
+      //node.begin(SerialInterface);
+      slaveNumber=_slaveNumber;
+      pinNumber = _pinNumber;
     //ModbusRTUServer.configureCoils(0x00,1);
     }
+    void update(){
+        Serial.println(String(millis()));
+          value= nodeRelays.readInputRegisters(slaveNumber,pinNumber,1);
+        Serial.println(String(millis()) + "read value:" +String(value));
+    }
+  void loop(){}
   private:
-    //ModbusRTUServer.
+  //ModbusMaster node;
+  int slaveNumber,pinNumber;
 };
 
 // ########################################
@@ -322,7 +333,7 @@ public:  //           Doesnt have a constructor, uses Wire by default
 
     //Serial.println(value);
   }
-  float getSecondValue() { return bmp.readTemperature(); }
+  float getSecondValue() { if(firstRun){return 0;}else{return bmp.readTemperature();} }
   void setUnit(int _unit){unit=_unit;}
 protected:
   boolean firstRun = true;
@@ -388,14 +399,16 @@ public:
     Weight = Weight ^ 0x800000;
     digitalWrite(Clock, LOW);
 
-      //Serial.println(Weight);
+      Serial.println(Weight);
     
     if (useAverage) {
       avg.addValue(Weight);
       value = avg.getAverage();
-        }    }
+        }    
     else { value = Weight;}
+    }
     // if (firstRun)
+
     // {
     //   firstRun = false;   // todavia no se si hay que setear esto cada vez o otro sensor que use WIRE setea los pins diferentes
     //   hx711.begin(dataPin,clockPin);
@@ -409,7 +422,7 @@ protected:
   boolean firstRun = true;
   long Weight = 0;
   AverageModule avg;
-  bool useAverage = true;
+  bool useAverage = false;
   //HX711 hx711;
   //Q2HX711 *hx711;//                      =HX711(PIN_DOUT,PIN_SCK);
   int Dout =SDA;

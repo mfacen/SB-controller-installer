@@ -96,3 +96,4 @@ String getContentType(String filename);
 void consoleLog (String id,String s);
 void process_data (const char * data);                          // Process data received.
 void processIncomingByte (const byte inByte);                   // Process the Serial data received until /n detected
+void iddleTime();

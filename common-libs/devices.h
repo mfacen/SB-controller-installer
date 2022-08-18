@@ -165,7 +165,7 @@ public:
       servings->update();
       airTime->update();
       firstRun = false;
-      millisStart->update(0); // Resetear millisStart ????????????????????? Directamente hacer variable normal
+      millisStart->update(millis()); // Resetear millisStart ????????????????????? Directamente hacer variable normal
       air->update(0);
       feed->update(0);
       dispensed->update((servings->value - feedNumber->value) * weight->value / servings->value);
@@ -402,7 +402,7 @@ public:
     id = _id;
     name = _name;
     relay = new DigitalOutput(pin_rly, id + "rly");
-    tempProbe = new Dsb18B20(pin_tempProbe, id + "tmpProbe");
+    tempProbe = new Dsb18B20(pin_tempProbe);
     edtSet = new SavedEdit("Setpoint", id + "Set", "/status.sta", "number");
     pwm = new PWM(60000, relay);
     set = new Set("relay", "rly", relay);
@@ -442,7 +442,6 @@ public:
   String getHtml()
   {
     String s = "<div class='card'><h4>" + name + "<h4>";
-    s += tempProbe->getHtml();
     s += set->getHtml();
     s += edtSet->getHtml();
     s+= panOut->getHtml();

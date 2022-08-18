@@ -131,19 +131,18 @@ public:
       }
     }
     mapFile.seek(0, SeekSet);
-    mapFile.close();
-    SPIFFS.remove(file.c_str());
+    //mapFile.close();
+    //SPIFFS.remove(file.c_str());
     mapFile = FILE_SYS.open(file, "r+");
     //if (debug) Serial.println("new Settings: \n"+settings);
     mapFile.write((uint8_t *)outputString.c_str(), outputString.length());
     #ifdef ESP8266
-    //mapFile.truncate(outputString.length()); //  ESTO ES NUEVO PARA NO DEJAR COLAS EN EL ARCHIVO
+    mapFile.truncate(outputString.length()); //  ESTO ES NUEVO PARA NO DEJAR COLAS EN EL ARCHIVO
     #endif
     #ifdef ESP32
     //mapFile.truncate(outputString.length()); //  Para hacer truncate debo updatear pero hay problemas de dependencias
-    
     // truncate viene en la version 4.00
-    //mapFile.seek(outputString.length()+1);
+    mapFile.seek(outputString.length()+1);
     //mapFile.write(EOF);
     #endif
     mapFile.close();

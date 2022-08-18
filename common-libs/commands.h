@@ -334,12 +334,56 @@ public:
     interval = i;
     btnSnap = new Button("sn" + id, "Snap", this);
     btnSave = new Button("sa" + id, "Save", this);
-    btnView = new Button("vi" + id, "View", this);
-    btnDelete = new Button("de" + id, "Delete", this);
+    //btnView = new Button("vi" + id, "View", this);
+    //btnDelete = new Button("de" + id, "Delete", this);
     btnUpload = new Button("up" + id, "Upload", this);
     // chart = new Chart ("ch"+id,this);
   }
+ String getHtml()
+  {
+    String str = "<div class='card' ";
+    str += style;
+    str += " id='";
+    str += name;
+    str += "'><h4>";
+    str += name;
+    str += "</h4><br><div>";
+    str += chkTimer->getHtml();
+    str += " Interval: ";
+    str += edtInterval->getHtml();
+    str += meter->getHtml();
+    str += "</div><br><div>";
+    str += chkDeviation->getHtml();
+    str += " Threshold: ";
+    str += edtPercentage->getHtml();
+    str += "</div><br><div>";
+    str += chkUpload->getHtml();
+    str += "</div><br><div>";
+    str += btnSnap->getHtml();
+    str += btnSave->getHtml();
+   // str += btnView->getHtml();
+   // str += btnDelete->getHtml();
+    str += btnUpload->getHtml();
+    //         str += "<div><br>Inputs:";      Uncomment this to show inputs.
+    //         if (index!=0) {
+    //           str+="<ul>";
+    //          for ( int i=0; i<index; i++ ) { str+="<li>";str += inputArray[i]->name ; str+= "</li>"; }
+    //          }
+    //          //         if (indexO!=0) {
+    //          //     return "";
+    //  //for ( int i=0; i<indexO; i++ ) { str += outputArray[i]->getName(); ; str+=String ( sizeof( outputArray[i])) ; str+= "<br>"; }
+    //          // }
+    //                  if (indexF!=0) {
+    //          for ( int i=0; i<indexF; i++ ) { str +="<li>" + names[i] ; str+=  "</li>"; }
+    //          }
+    //                str+="</ul></div>";
 
+    str += "</div> ";
+    // str+=chart->getHtml();
+    str += "</div>";
+
+    return str;
+  }
   void addInput(ElementsHtml *i)
   {
     if (index <= 29)
@@ -510,51 +554,7 @@ public:
     }
     return r;
   }
-  String getHtml()
-  {
-    String str = "<div class='card' ";
-    str += style;
-    str += " id='";
-    str += name;
-    str += "'><h4>";
-    str += name;
-    str += "</h4><br><div>";
-    str += chkTimer->getHtml();
-    str += " Interval: ";
-    str += edtInterval->getHtml();
-    str += meter->getHtml();
-    str += "</div><br><div>";
-    str += chkDeviation->getHtml();
-    str += " Threshold: ";
-    str += edtPercentage->getHtml();
-    str += "</div><br><div>";
-    str += chkUpload->getHtml();
-    str += "</div><br><div>";
-    str += btnSnap->getHtml();
-    str += btnSave->getHtml();
-    str += btnView->getHtml();
-    str += btnDelete->getHtml();
-    str += btnUpload->getHtml();
-    //         str += "<div><br>Inputs:";      Uncomment this to show inputs.
-    //         if (index!=0) {
-    //           str+="<ul>";
-    //          for ( int i=0; i<index; i++ ) { str+="<li>";str += inputArray[i]->name ; str+= "</li>"; }
-    //          }
-    //          //         if (indexO!=0) {
-    //          //     return "";
-    //  //for ( int i=0; i<indexO; i++ ) { str += outputArray[i]->getName(); ; str+=String ( sizeof( outputArray[i])) ; str+= "<br>"; }
-    //          // }
-    //                  if (indexF!=0) {
-    //          for ( int i=0; i<indexF; i++ ) { str +="<li>" + names[i] ; str+=  "</li>"; }
-    //          }
-    //                str+="</ul></div>";
-
-    str += "</div> ";
-    // str+=chart->getHtml();
-    str += "</div>";
-
-    return str;
-  }
+ 
   //              Atencion si falta una de los metodos static se produce un Error que no se detecta y no hay HTML
 
   String postCallBack(ElementsHtml *e, String postValue)
@@ -575,24 +575,24 @@ public:
       SPIFFS.rename("/capturas/" + fileName, "/capturas/Capture-" + String(now()).substring(6) + ".csv");
 #endif
     };
-    if (e == btnView)
-    {
-      javaQueue.addJsonInner(id, "redirect=graphic.html?file=/capturas/" + fileName);
-    }
-    if (e == btnDelete)
-    {
-#ifdef ESP8266
-      if (LittleFS.exists("/" + fileName))
-      {
-        LittleFS.remove("/" + fileName);
-#endif
-#ifdef ESP32
-        if (SPIFFS.exists("/" + fileName))
-        {
-          SPIFFS.remove("/" + fileName);
-#endif
-        }
-      }
+//     if (e == btnView)
+//     {
+//       javaQueue.addJsonInner(id, "redirect=graphic.html?file=/capturas/" + fileName);
+//     }
+//     if (e == btnDelete)
+//     {
+// #ifdef ESP8266
+//       if (LittleFS.exists("/" + fileName))
+//       {
+//         LittleFS.remove("/" + fileName);
+// #endif
+// #ifdef ESP32
+//         if (SPIFFS.exists("/" + fileName))
+//         {
+//           SPIFFS.remove("/" + fileName);
+// #endif
+//         }
+//       }
       if (e == btnUpload)
       {
         itWorked = uploadToServer();
@@ -856,7 +856,7 @@ public:
       String ff[2] = {"Timer", "Deviation"};
       Label *edtInterval;
       Button *btnSnap;
-      Button *btnDelete;
+      //Button *btnDelete;
       Button *btnUpload;
       String fileName;
       SavedEdit *chkUpload;
@@ -870,7 +870,7 @@ public:
       Pause *pauseUpload;
       int interval = 60;
       Button *btnSave;
-      Button *btnView;
+      //Button *btnView;
       unsigned long lastUploadTry = 0;
       String sha1 = "BE:22:E9:99:11:41:F0:32:FC:DF:18:72:BC:8B:94:FA:86:24:25:B6";
       // Chart *chart;

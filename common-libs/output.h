@@ -1,4 +1,4 @@
-#include ".pio/libdeps/d1_mini/Time_ID44/Time.h"
+#include <TimeLib.h>
 //#include <ArduinoModbus.h>
 
 class Input;
@@ -15,8 +15,6 @@ public:
   virtual void update();
   virtual void update(float f);
 };
-
-
 class FakeOutput: public HardwareOutput
 {
   void update(){}
@@ -485,8 +483,8 @@ class ModbusRelay: public HardwareOutput{
     void update(){
       if (lastValue != value ){
       unsigned long tmr = millis();
-      node.writeSingleRegister(relayNumber,(value?0x0100:0x0200) );
-      Serial.println("Elapsed time for RS485 com: "+String(millis()-tmr));
+      nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
+      Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
       }
     }
@@ -504,18 +502,26 @@ class ModbusRelay: public HardwareOutput{
 class ModbusVFD: public HardwareOutput {
   public:
     ModbusVFD ( int _slaveID ){ slaveID=_slaveID;}
-    void update(float v){ value = v ;}
+    void update(float v){ value = v ;update();}
     void update(){
-        node.begin(slaveID,SerialInterface); // checar si no hay memory leak aqui !!!!
+      if (lastValue!=value){
+        Serial.println("Trying to write to VFD modbus value=" + String(value));
+              unsigned long tmr = millis();
+
         if (value==0)
-        node.writeSingleRegister(0x2000,0 );
+        nodeRelays.writeSingleRegister(0x1000,5, slaveID );
         else {
-        node.writeSingleRegister(0x2000,1 );
-        node.writeSingleRegister(0x2001,value );
+        nodeRelays.writeSingleRegister(0x1000,1,slaveID );
+        nodeRelays.writeSingleRegister(0x3001,value ,slaveID);
         }
+              Serial.println("Elapsed time for RS485 com to VFD: "+String(millis()-tmr));
+
+        lastValue = value;
+      }
     }
   private:
     int slaveID;
+    float lastValue=-1;
 };
 
 // ########################################
@@ -608,63 +614,6 @@ class BinaryOutput: public HardwareOutput {
 };
 
 
-// ########################################
-//  GENERIC OUTPUT PANEL
-// ########################################
-class GenericOutputPanel : public Output
-{
-
-public:
-  GenericOutputPanel( String _name, String _id, String _unit,HardwareOutput *out=NULL, bool inverted = false)
-  { /// Constructor
-    id = _id;
-    name = _name;
-    unit = _unit;
-    //descriptor = name;
-    label = new Label("lbl" + id,"text", this);
-    label->setStyle(" class='numInp' "); //   Esto lo hago desde el CSS es una clase
-    value=0;
-    invertedLogic = inverted;
-    output = out;
-  };
-  void update(){
-    //output->update(value);
-    label->update(value);
-    };
-  void update(String sss) { update(sss.toFloat()); };
-  void update(float _value)
-  {
-    //Serial.println("Updating "+id+" Value: " + String(_value));
-    value = _value;
-    if (output!=NULL) output->update(value);
-    label->update(value);
-  }
-
-  String getHtml()
-  {
-    String s = " <div class='card'";
-    s += style;
-    s += " id='";
-    s += id;
-    s += "'><h4>";
-    s += name;
-    s += "</h4><br>";
-    s += label->getHtml();
-    s += "<br>";
-    s += unit;
-    s += "</div>";
-    return s;
-  }
-
-  String postCallBack(ElementsHtml *e, String postValue) { 
-     // if (e==label){value=postValue.toFloat();output->update(value);}
-          return ""; 
-          }
-
-private:
-  Label *label;
-  HardwareOutput *output;
-};
 
 // ########################################
 //  RELAY OUTPUT
