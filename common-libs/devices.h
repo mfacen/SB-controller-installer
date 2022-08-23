@@ -157,7 +157,6 @@ public:
   {
     if (firstRun)
     {
-      savedVariable::init();
       setLogger();
       weight->update();
       interval->update();
@@ -297,12 +296,11 @@ public:
     name = _name;
     id = _id;
     vent_bars = _hardwareInput;
-    oxi = new RS485_Device(id + "oxi");
     pressure = new GenericInputPanel( id + "mbar", "mBar", vent_bars,true,true,this);
-    oxigen = new GenericOutputPanel("Oxigeno", id + "ox", "mg/l", oxi,this);
+    //oxigen = new GenericOutputPanel("Oxigeno", id + "ox", "mg/l", oxi,this);
     speedCtrl = _hardwareOutput;
     fakeOut = new FakeOutput();
-    speedCtrlPanel = new GenericOutputPanel("Vent_speed", id + "spd", "Hz", speedCtrl,this);
+    speedCtrlPanel = new GenericOutputPanel("Vent_speed", id + "spd", "%", speedCtrl,this);
     tmrVenturi = new GenericTimer("Venturi Timer", id + "tVen", fakeOut,this);
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
     edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");
@@ -313,14 +311,14 @@ public:
   void setUpLogger()
   {
     logger->addInput(speedCtrlPanel);
-    logger->addInput(oxigen);
+    //logger->addInput(oxigen);
     logger->addInput(edtSetting);
   }
   void init()
   {
     myPID->SetMode(AUTOMATIC);
-    myPID->SetOutputLimits(0, 7);
-    oxigen->update(6);
+    myPID->SetOutputLimits(0, 100);
+    //oxigen->update(6);
     // pressure->update(10);
   }
   String getHtml()
@@ -331,7 +329,7 @@ public:
     s += speedCtrlPanel->getHtml();
     s += PID_GUI->getHtml();
     s += tmrVenturi->getHtml();
-    s += oxigen->getHtml();
+    //s += oxigen->getHtml();
     // s+=edtMinOxy->getHtml();
     s += "</div>";
     return s;
@@ -347,7 +345,7 @@ public:
     pressure->update();
     speedCtrlPanel->update();
     vent_bars->update();
-    if ((!tmrVenturi->value) && (oxigen->value > 4))
+    if ((!tmrVenturi->value) )// && (oxigen->value > 4))
     {
       input = vent_bars->value;
       setpoint = edtSetting->value;
@@ -359,15 +357,14 @@ public:
       speedCtrlPanel->update(output);
     }
     else
-      speedCtrlPanel->update(7);
+      speedCtrlPanel->update(100);
   }
   String postCallBack() { return ""; }
   ElementsHtml *searchById(String _id)
   {
     if (_id == pressure->id)
       return pressure;
-    else if (_id == oxigen->id)
-      return oxigen;
+    
     else if (_id == speedCtrlPanel->id )  // este en realidad no hace falta, solo para los que 
       return speedCtrlPanel;              // hacen update en a travez del rs485
     return NULL;
@@ -376,7 +373,6 @@ public:
 
 private:
   HardwareInput *vent_bars;
-  RS485_Device *oxi;
   GenericInputPanel *pressure;
   GenericOutputPanel *oxigen;
   HardwareOutput *speedCtrl;
@@ -419,7 +415,7 @@ public:
     if (firstRun)
     {
       myPID->SetMode(AUTOMATIC);
-      myPID->SetOutputLimits(0, 10);
+      myPID->SetOutputLimits(0, 60);
       edtSet->update();
       pid_module->updateTuning();
     }

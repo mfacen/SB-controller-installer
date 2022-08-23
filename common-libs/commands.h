@@ -390,7 +390,7 @@ public:
     {
       inputArray[index] = i;
       index++;
-      Serial.println("Added: "+i->name);
+      //Serial.println("Added: "+i->name);
     }
     else {Serial.println("ERROR LIMIT OF PAGE ELEMENTS REACHED !!!!!!!!!!");ESP.restart();}
   }

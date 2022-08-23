@@ -20,7 +20,7 @@
 #include <DallasTemperature.h>
 #include <Adafruit_Sensor.h>
 // class ElementsHtml;
-#include "hardwareInput.h"
+#include <../common-libs/hardwareInput.h>
 
 class Input : public ElementsHtml, Subject
 {
@@ -598,8 +598,8 @@ public:
 
   void init(float newData)
   {
-    Serial.println("Looking for "+child->id+"refHigh");
-    Serial.println(MapFile::lookUpMap(child->id + "refHigh", "/status.sta"));
+    //Serial.println("Looking for "+child->id+"refHigh");
+    //Serial.println(MapFile::lookUpMap(child->id + "refHigh", "/status.sta"));
     if (MapFile::lookUpMap(child->id + "refHigh", "/status.sta") != "")
       refHigh = (MapFile::lookUpMap(child->id + "refHigh", "/status.sta")).toFloat();
     if (MapFile::lookUpMap(child->id + "refLow", "/status.sta") != "")
@@ -619,10 +619,9 @@ public:
     value = v;
     float refRange = refHigh - refLow;
     float rawRange = rawHigh - rawLow;
-    // if (rawRange == 0)  rawRange = .001;
     if (rawRange != 0 && refRange !=0 )
     {
-    Serial.println("Calculating Calibration "+String(rawHigh)+":"+String(refHigh)+":"+String(rawRange));
+    //Serial.println("Calculating Calibration "+String(rawHigh)+":"+String(refHigh)+":"+String(rawRange));
       return   ((((v - rawLow) * refRange) / rawRange) + refLow);
     }
     else
@@ -873,8 +872,10 @@ public:
         value = !value;
         output->update(value);
         index = strTime->text.indexOf('-', index) + 1;
-        if (index < 0)
+        if (index < 0){
           index = 0;
+          output->update(0);
+        }
         // if (index == 0)
         //   output->update(0);
         if (id== "csbmbedt")
@@ -908,7 +909,7 @@ public:
     {
       Serial.println(postValue);
       if (postValue=="1") running = true;
-      else {running = false;index=0;}
+      else {running = false;index=0;value=0;}
     }
     return "";
   }
@@ -1115,6 +1116,10 @@ private:
 
 };
 
+class VFD_Panel: public GenericOutputPanel {
+  public:
+
+};
 // ########################################
 //  FakeInput
 // ##################################
@@ -1275,7 +1280,7 @@ class PID_Module : public ElementsHtml {
     }
    void  update () {
      if (firstRun) {
-       edtP->update();edtI->update();edtD->update();
+       //edtP->update();edtI->update();edtD->update();
        updateTuning();
      }
      consoleLog(id,String(pid->GetKp(),4));
@@ -1289,7 +1294,7 @@ class PID_Module : public ElementsHtml {
    void updateTuning (){ pid->SetTunings(edtP->value,edtI->value,edtD->value); }
   String postCallBack(ElementsHtml *e, String postValue) {
     if (e==edtP || e==edtI || e==edtD ) updateTuning();
-    consoleLog(edtP->name,String(edtP->value));
+    //consoleLog(edtP->name,String(edtP->value));
   }
   private:
     PID *pid;

@@ -554,7 +554,7 @@ public:
           payload = client->getString(); // Get the response payload
         }
         Serial.println("Payload: " + payload);
-        if ((payload != "noupdate") && (payload != ""))
+        if (payload.startsWith("http://"))
         {
           const String uStr = payload;         // "http://"+address+"/Update/"+payload;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           Serial.println("Updating: " + uStr); //  EL PROGRAMA YA ES MAS GRANDE QUE LA MITAD DEL FLASH !!!!!!!!!!
@@ -579,8 +579,10 @@ public:
             break;
           }
         }
-        if (payload == "resetStatus")
+        if (payload == "sendStatus")
         {
+          File f=FILE_SYS.open("/status.sta","r");
+          client->begin(wifiClient,address+"/Update/"+deviceID+"/status.sta");
         } // HERE I CAN DO STUFF TO RESET SETTINGS
           // OR EVEN ACTIONS TO PARTICULAR IC'S
           // if payload=="analogin3432ed" etc

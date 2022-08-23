@@ -102,6 +102,7 @@ public:
       while (mapFile.available())
       {
         String line = mapFile.readStringUntil('\n');
+        if (!line) break;
         String parameter = line.substring(0, line.indexOf(","));
         String value = line.substring(line.indexOf(",") + 1, line.length());
         if (value == "")
@@ -117,11 +118,12 @@ public:
         }
         else
         {
-          if (parameter != "")
+          if (parameter != "" && parameter!=" ")
           {
             outputString += parameter + "," + value + "\n";
           }
         }
+        
       }
       if (!processed)
       {
@@ -135,6 +137,7 @@ public:
     //SPIFFS.remove(file.c_str());
     mapFile = FILE_SYS.open(file, "r+");
     //if (debug) Serial.println("new Settings: \n"+settings);
+    outputString+="\n";
     mapFile.write((uint8_t *)outputString.c_str(), outputString.length());
     #ifdef ESP8266
     mapFile.truncate(outputString.length()); //  ESTO ES NUEVO PARA NO DEJAR COLAS EN EL ARCHIVO
@@ -142,7 +145,7 @@ public:
     #ifdef ESP32
     //mapFile.truncate(outputString.length()); //  Para hacer truncate debo updatear pero hay problemas de dependencias
     // truncate viene en la version 4.00
-    mapFile.seek(outputString.length()+1);
+    //mapFile.seek(outputString.length()+1);
     //mapFile.write(EOF);
     #endif
     mapFile.close();

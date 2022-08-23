@@ -98,10 +98,11 @@ void postTransmission()
 #define SerialInterface Serial
 #define SerialCtrlPin D3
 #endif
+enum VFD_Types { SOYAN_SVD , MOLLOM_B20 };
 
 String mqttServer = "192.168.1.115";
 #include "classes.h"
-#include "declarations.h"
+#include "../common-libs/declarations.h"
 //#include "ESP8266FtpServer.h"
 //#include <PubSubClient.h>
 #include "MQTT.h"

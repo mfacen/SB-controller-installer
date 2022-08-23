@@ -160,10 +160,10 @@ void startUpWifi()
   #endif
   nodeRelays.begin(SerialInterface);
   // Callbacks allow us to configure the RS485 transceiver correctly
+
   nodeRelays.preTransmission(preTransmission);
   nodeRelays.postTransmission(postTransmission);
   nodeRelays.idle( &iddleTime);
-
 }
 void printJavaQueue(Page page)
 {

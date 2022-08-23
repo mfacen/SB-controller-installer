@@ -1,4 +1,4 @@
-#include <TimeLib.h>
+#include "TimeLib.h"
 //#include <ArduinoModbus.h>
 
 class Input;
@@ -484,6 +484,7 @@ class ModbusRelay: public HardwareOutput{
       if (lastValue != value ){
       unsigned long tmr = millis();
       nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
+      
       Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
       }
@@ -501,20 +502,39 @@ class ModbusRelay: public HardwareOutput{
 
 class ModbusVFD: public HardwareOutput {
   public:
-    ModbusVFD ( int _slaveID ){ slaveID=_slaveID;}
+    ModbusVFD ( int _slaveID , int _type=0){ slaveID=_slaveID;type=_type;}
     void update(float v){ value = v ;update();}
     void update(){
       if (lastValue!=value){
         Serial.println("Trying to write to VFD modbus value=" + String(value));
-              unsigned long tmr = millis();
+        unsigned long tmr = millis();
 
-        if (value==0)
-        nodeRelays.writeSingleRegister(0x1000,5, slaveID );
-        else {
-        nodeRelays.writeSingleRegister(0x1000,1,slaveID );
-        nodeRelays.writeSingleRegister(0x3001,value ,slaveID);
+        if (value==0) {
+        running = false;
+        if (type==VFD_Types::SOYAN_SVD)
+          nodeRelays.writeSingleRegister(0x1000,5, slaveID );
+        if (type==VFD_Types::MOLLOM_B20)
+          nodeRelays.writeSingleRegister(0x2000,1, slaveID );
         }
-              Serial.println("Elapsed time for RS485 com to VFD: "+String(millis()-tmr));
+        else {
+          if (type==VFD_Types::SOYAN_SVD)
+            nodeRelays.writeSingleRegister(0x2000,value * 100  ,slaveID);
+          if (type==VFD_Types::MOLLOM_B20)
+            nodeRelays.writeSingleRegister(0x2001,value * 100  ,slaveID);
+
+        if (!running){
+          if (type==VFD_Types::SOYAN_SVD)
+            nodeRelays.writeSingleRegister(0x1000,1,slaveID );
+          if (type==VFD_Types::MOLLOM_B20){
+            nodeRelays.writeSingleRegister(0x2000,0x12,slaveID );
+            Serial.println(nodeRelays.readHoldingRegisters(0x2101,1,slaveID));
+            
+          }
+          //running=true;
+          if (loop==40) loop=1;
+        }
+        }
+        //     Serial.println(String (type)+" Elapsed time for RS485 com to VFD: "+String(millis()-tmr));
 
         lastValue = value;
       }
@@ -522,6 +542,9 @@ class ModbusVFD: public HardwareOutput {
   private:
     int slaveID;
     float lastValue=-1;
+    float running=false;
+    int type=0;
+    int loop=1;
 };
 
 // ########################################
