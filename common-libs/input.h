@@ -1270,7 +1270,7 @@ class PID_Module : public ElementsHtml {
       edtP = new SavedEdit ( "kP",id + "edtP","/status.sta","number",this);
       edtI = new SavedEdit ( "kI",id + "edtI","/status.sta","number",this);
       edtD = new SavedEdit ( "kD",id + "edtD","/status.sta","number",this);
-      onOff = new SavedEdit ( "onOff",id + "edtOn","/status.sta","checkbox",this);
+      //onOff = new SavedEdit ( "onOff",id + "edtOn","/status.sta","checkbox",this);
     }
     String getHtml () {
       String s="<div class='spdCtrl'><h4>"+id+"</h4>";
@@ -1300,7 +1300,7 @@ class PID_Module : public ElementsHtml {
     PID *pid;
     SavedEdit *edtP, *edtI , *edtD;
     //Label *lblInp, *lblSet, *lblOut;
-    SavedEdit *onOff;
+    //SavedEdit *onOff;
     String id;
 };
 
