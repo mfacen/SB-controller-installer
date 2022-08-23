@@ -89,7 +89,9 @@ public:
     LittleFS.exists(file.c_str()) ? mapFile = LittleFS.open(file, "r+") : mapFile = LittleFS.open(file, "r+");
     #endif
     #ifdef ESP32
-    FILE_SYS.exists(file.c_str()) ? mapFile = FILE_SYS.open(file, "r+") : mapFile = FILE_SYS.open(file, "r+");
+    FILE_SYS.exists(file.c_str()) ? 
+      mapFile = FILE_SYS.open(file, "r+") : 
+      mapFile = FILE_SYS.open(file, "r+");
     #endif
     //Serial.println(file + String(mapFile));
     String outputString;
@@ -102,7 +104,7 @@ public:
       while (mapFile.available())
       {
         String line = mapFile.readStringUntil('\n');
-        if (!line) break;
+        if (!line || line==String('\n')) break;
         String parameter = line.substring(0, line.indexOf(","));
         String value = line.substring(line.indexOf(",") + 1, line.length());
         if (value == "")
@@ -118,7 +120,7 @@ public:
         }
         else
         {
-          if (parameter != "" && parameter!=" ")
+          if (parameter != "" && parameter!=" " && parameter!=",")
           {
             outputString += parameter + "," + value + "\n";
           }

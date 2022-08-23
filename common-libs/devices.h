@@ -340,6 +340,8 @@ public:
     {
        setUpLogger();
       firstRun = false;
+      setpoint = vent_bars->value;
+      edtSetting->update();
     }
     tmrVenturi->update();
     pressure->update();

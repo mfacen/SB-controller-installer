@@ -1273,19 +1273,19 @@ class PID_Module : public ElementsHtml {
       onOff = new SavedEdit ( "onOff",id + "edtOn","/status.sta","checkbox",this);
     }
     String getHtml () {
-      String s="<div class='card'><h4>"+id+"</h4>";
-      s=s+edtP->getHtml()+edtI->getHtml()+edtD->getHtml();
+      String s="<div class='spdCtrl'><h4>"+id+"</h4>";
+      s+=edtP->getHtml()+edtI->getHtml()+edtD->getHtml();
       s+="</div>";
       return s;
     }
    void  update () {
      if (firstRun) {
-       //edtP->update();edtI->update();edtD->update();
+       edtP->update();edtI->update();edtD->update();
        updateTuning();
      }
-     consoleLog(id,String(pid->GetKp(),4));
-     consoleLog(id,String(pid->GetKi(),4));
-     consoleLog(id,String(pid->GetKd(),4));
+     //consoleLog(id,String(pid->GetKp(),4));
+     //consoleLog(id,String(pid->GetKi(),4));
+     //consoleLog(id,String(pid->GetKd(),4));
    }
    void setPidParameters (){}
    void setP (double p){ edtP->update(p); updateTuning();}

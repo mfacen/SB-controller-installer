@@ -92,27 +92,32 @@ void setup()
     page.addString("<p>"
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
-                    "<div><div class='divMain'><h3>Tanque Superior</h3><br>");
+                    "<h3>Tanque Superior</h3><div>");
     //page.addElement(&modLedSet);
-    page.addString("<div class=''>");
+   // page.addString("<div class=''>");
     page.addElement(&spdSup);
+    page.addString("<div class='card'>");
     page.addElement(&residuosSup);
-    page.addElement(&clarificadorSup);
-    page.addString("</div><div class=''>");
-    page.addElement(&feederSup);
     page.addElement(&skimmer_sup);
-    page.addString("</div></div><div class='divMain'><h3>Tanque Inferior</h3><br>");
+    page.addElement(&clarificadorSup);
+    page.addString("</div>");
+   // page.addString("</div><div class=''>");
+    page.addElement(&feederSup);
+    page.addString("</div><h3>Tanque Inferior</h3><div>");
+    //page.addString("<h3>Tanque Inferior</h3>");//<div class='divMain'>");
+    //page.addString("<div class=''>");
     page.addElement(&spdInf);
-    page.addString("<div class=' card'>");
+    page.addString("<div class='card'>");
     page.addElement(&residuosInf);
-    page.addElement(&clarificadorInf);
-    page.addString("</div><div class='card'>");
-    page.addElement(&feederInf);
     page.addElement(&skimmer_inf);
-    page.addString("</div></div></div><div>");
+    page.addElement(&clarificadorInf);
+    page.addString("</div>");
+    //page.addString("</div><div class=''>");
+    page.addElement(&feederInf);
+    page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
-    page.addString("</div>");
+    //page.addString("</div>");
 
     // page.addElement(&graphic);
     page.addString("<br>");

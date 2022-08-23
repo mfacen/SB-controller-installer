@@ -181,8 +181,7 @@ h4 {
     display: contents;
 }
 div {
-	display: flex;
-	flex-flow: row wrap;
+	display: block ruby;
 	width: fit-content;
 }
 

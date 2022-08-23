@@ -506,7 +506,7 @@ class ModbusVFD: public HardwareOutput {
     void update(float v){ value = v ;update();}
     void update(){
       if (lastValue!=value){
-        Serial.println("Trying to write to VFD modbus value=" + String(value));
+        //Serial.println("Trying to write to VFD modbus value=" + String(value));
         unsigned long tmr = millis();
 
         if (value==0) {
@@ -527,11 +527,10 @@ class ModbusVFD: public HardwareOutput {
             nodeRelays.writeSingleRegister(0x1000,1,slaveID );
           if (type==VFD_Types::MOLLOM_B20){
             nodeRelays.writeSingleRegister(0x2000,0x12,slaveID );
-            Serial.println(nodeRelays.readHoldingRegisters(0x2101,1,slaveID));
-            
+            if (!nodeRelays.readHoldingRegisters(0x2100,1,slaveID))
+            Serial.println(nodeRelays.getResponseBuffer(0));
           }
           //running=true;
-          if (loop==40) loop=1;
         }
         }
         //     Serial.println(String (type)+" Elapsed time for RS485 com to VFD: "+String(millis()-tmr));
@@ -544,7 +543,6 @@ class ModbusVFD: public HardwareOutput {
     float lastValue=-1;
     float running=false;
     int type=0;
-    int loop=1;
 };
 
 // ########################################
