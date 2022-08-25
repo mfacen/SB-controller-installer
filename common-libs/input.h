@@ -952,7 +952,7 @@ class GenericInputPanel : public Input
 {
 public:
   GenericInputPanel(String n, String u, HardwareInput *h = NULL, bool use_calibration = false,
-                    bool use_Average = false, ElementsHtml *e = NULL)
+                    bool use_Average = false, ElementsHtml *e = NULL,bool _allow_name_change=true)
   {
     id = n;
     unit = u;
@@ -967,8 +967,10 @@ public:
       cal = new calibration_module(id + "Cal", this);
     if (use_Average)
       avg = new AverageModule();
+      allow_change_name=_allow_name_change;
     // chart = new Chart ( "chart"+id,this);
   }
+  void setAllowChangeName(bool b){allow_change_name=b;}
   String getHtml()
   {
     String s = " <div class='card'";
@@ -978,7 +980,7 @@ public:
     s += "'><h4>";
     s += name;
     s += "</h4>";
-    s+= btnID->getHtml();
+    if (allow_change_name) s+= btnID->getHtml();
     s += label->getHtml();
     s += "<br>";
     s += unit;
@@ -1041,6 +1043,7 @@ private:
   calibration_module *cal;
   AverageModule *avg;
   bool secondValueBool = false;
+  bool allow_change_name = true;
   // Chart *chart;
 };
 // ########################################
@@ -1050,7 +1053,13 @@ class GenericOutputPanel : public Output
 {
 
 public:
-  GenericOutputPanel( String _name, String _id, String _unit,HardwareOutput *out=NULL, bool inverted = false)
+  GenericOutputPanel( String _name,
+                         String _id, 
+                         String _unit,
+                         HardwareOutput *out=NULL,
+                          bool inverted = false,
+                          ElementsHtml *_parent=NULL,
+                          bool _allow_name_change=true)
   { /// Constructor
     id = _id;
     name = _name;
@@ -1062,6 +1071,7 @@ public:
     value=0;
     invertedLogic = inverted;
     output = out;
+    allow_name_change = _allow_name_change;
   };
   void update(){
     if (firstRun){
@@ -1090,7 +1100,7 @@ public:
     s += "'><h4>";
     s += name;
     s += "</h4>";
-    s+= btnID->getHtml();
+    if (allow_name_change) s+= btnID->getHtml();
     s+="<br>";
     s += label->getHtml();
     s += "<br>";
@@ -1113,7 +1123,7 @@ private:
   HardwareOutput *output;
     ButtonPrompt *btnID;
   savedVariable *columnName;
-
+  bool allow_name_change = false;
 };
 
 class VFD_Panel: public GenericOutputPanel {

@@ -125,7 +125,7 @@ void setup()
     page.addElement(&lblVersion);
     // page.addElement(&btnWifi);
 
-    page.setDebug(true); //
+    //page.setDebug(true); //
 
     Serial.println("page.getHTML()");
 

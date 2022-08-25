@@ -11,7 +11,7 @@ public:
     bomba = _bomba; // new DigitalOutput ( pinBomba, id+"bomba", true );
     electroV = _ev; // new DigitalOutput ( pinElectrovalvula, id+"ev", true );
     bombaTimer = new GenericTimer("Bomba", id + "bmb", bomba);
-    valvulaPanel = new GenericOutputPanel("Electro Valve", id + "_EV", "", electroV, false);
+    valvulaPanel = new GenericOutputPanel("Electro Valve", id + "_EV", "", electroV, false,this,false);
     onoffswitch = new SavedEdit("running",id + "edt","/status.sta", "checkbox", this);
     //running = new savedVariable(id + "running");
     //running->setFile("/status.sta");
@@ -296,11 +296,11 @@ public:
     name = _name;
     id = _id;
     vent_bars = _hardwareInput;
-    pressure = new GenericInputPanel( id + "mbar", "mBar", vent_bars,true,true,this);
+    pressure = new GenericInputPanel( id + "mbar", "mBar", vent_bars,true,true,this,false);
     //oxigen = new GenericOutputPanel("Oxigeno", id + "ox", "mg/l", oxi,this);
     speedCtrl = _hardwareOutput;
     fakeOut = new FakeOutput();
-    speedCtrlPanel = new GenericOutputPanel("Vent_speed", id + "spd", "%", speedCtrl,this);
+    speedCtrlPanel = new GenericOutputPanel("Vent_speed", id + "spd", "%", speedCtrl,false,this,false);
     tmrVenturi = new GenericTimer("Venturi Timer", id + "tVen", fakeOut,this);
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
     edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");

@@ -1,5 +1,5 @@
 
-#include "../../SharpBox/include/header.h"
+#include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoard"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "1.23"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -15,7 +15,6 @@ Label lblVersion("lblVersion", "Device: " + String(DEVICE_NAME) + " - Ver: " + S
 DirCapture dirCapture("dCapt", "/capturas");
 //RS485Main serialCom(&page); // Esta es la #DEFINICION srlCtrlPin en todo el programa.
 //ModbusLed ledModbus ( 1 );
-ModbusRelay (1,1);
 //Set modLedSet ("Led","idLed",&ledModbus);
 DigitalOutput relayVenturiSup(14, "rlyVs", false); // VV
 DigitalOutput relayVenturiInf(22, "rlyVi", false); // VVV
@@ -28,7 +27,11 @@ DigitalOutput RelayClarInf(23, "rlyCi", false);
 DigitalOutput SkmSup(18, "rlysks", false);
 DigitalOutput SkmInf(32, "rlyski", false);
 DigitalOutput RelayBlowerSup(33, "rlyBs", false);
-DigitalOutput RelayBlowerInf(12, "rlyBi", false);
+DigitalOutput RelayBlowerInf(4, "rlyBi", false);
+DigitalOutput RelayFeederAirInf(21, "rlyBi", false);
+DigitalOutput RelayFeedeAirSup(13, "rlyBi", false);
+DigitalOutput RelayFeederFeedSup(5, "rlyBi", false);
+DigitalOutput RelayFeederFeedInf(15, "rlyBi", false);
 
 Set switchBlowerSup("Blower", "bls", &RelayBlowerSup);
 Set switchBlowerInf("Blower", "bls", &RelayBlowerInf);
@@ -36,18 +39,18 @@ Set switchBlowerInf("Blower", "bls", &RelayBlowerInf);
 Set skimmer_sup("Skimmer Sup", "skmSup", &SkmSup);
 Set skimmer_inf("Skimmer Inf", "skmInf", &SkmInf);
 
-Feeder feederSup("Alimentador Sup", "fdrSup", 13, 5, &switchBlowerSup, &logger);
-Feeder feederInf("Alimentador Inf", "fdrInf", 21, 15, &switchBlowerInf, &logger);
+Feeder feederSup("Alimentador Sup", "fdrSup", &RelayFeedeAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
+Feeder feederInf("Alimentador Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
 
 GenericTimer residuosSup("Residuos Sup", "rs", &relayResiduosSup);
 GenericTimer residuosInf("Residuos Inf", "ri", &relayResiduosInf);
 Clarificador clarificadorSup("Clarificador Sup", "cs", &RelayClarSup, &evClarSup, &logger);
 Clarificador clarificadorInf("Clarificador Inf", "ci", &RelayClarInf, &evClarInf, &logger);
 
-Speed_Control spdSup("Speed Ctrl Sup", "spd_sup", &logger);
-Speed_Control spdInf("Speed Ctrl Inf", "spd_inf", &logger);
+//Speed_Control spdSup("Speed Ctrl Sup", "spd_sup", &logger);
+//Speed_Control spdInf("Speed Ctrl Inf", "spd_inf", &logger);
 
-#include "../../SharpBox/include/footer.h"
+#include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");
@@ -62,31 +65,31 @@ void setup()
     startUpWifi();
     //Serial2.begin(115200, SERIAL_8N1, 16, 17);
     savedVariable::init();
-    spdInf.init();
-    spdSup.init();
+    //spdInf.init();
+    //spdSup.init();
     logger.addInput(&clarificadorInf);
     page.addElement(&lblTime);
     page.addString("<p>"
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
-                    "<div><div class='divMain'><h3>Tanque Superior</h3><br>");
+                    "<h3>Tanque Superior</h3><div>");
     //page.addElement(&modLedSet);
-    page.addElement(&spdSup);
+    //page.addElement(&spdSup);
     page.addString("<div class=' card'>");
     page.addElement(&residuosSup);
     page.addElement(&clarificadorSup);
     page.addString("</div><div class='card'>");
     page.addElement(&feederSup);
     page.addElement(&skimmer_sup);
-    page.addString("</div></div><div class='divMain'><h3>Tanque Inferior</h3><br>");
-    page.addElement(&spdInf);
+    page.addString("</div></div><h3>Tanque Inferior</h3><div>");
+   // page.addElement(&spdInf);
     page.addString("<div class=' card'>");
     page.addElement(&residuosInf);
     page.addElement(&clarificadorInf);
     page.addString("</div><div class='card'>");
     page.addElement(&feederInf);
     page.addElement(&skimmer_inf);
-    page.addString("</div></div></div>");
+    page.addString("</div></div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
 
@@ -116,7 +119,5 @@ void loop()
     generalLoop();
     if (millis() - lastCheck > 2000)
     {
-        serialCom.requestData("spd_supmbar");
-        lastCheck = millis();
     }
 }

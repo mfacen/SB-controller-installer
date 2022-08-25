@@ -120,7 +120,7 @@ public:
         }
         else
         {
-          if (parameter != "" && parameter!=" " && parameter!=",")
+          if (parameter != "" && parameter!=" " && parameter!="," && parameter.length()>1)
           {
             outputString += parameter + "," + value + "\n";
           }
