@@ -748,7 +748,7 @@ void handleBtnClick()
 
         if (callerName == "btnSleep") // Aqui he cambiado ahora es sleep forever
         {
-            Serial.println("BtnSleepPressed");
+            //Serial.println("BtnSleepPressed");
             secondsCapture = logger.getInterval();
             Serial.println("Going to sleep for ever"); // + String(secondsCapture) + " segundos.");
             saveSettings("secondsCapture", String(secondsCapture));

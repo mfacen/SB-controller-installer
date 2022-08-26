@@ -305,7 +305,7 @@ public:
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
     edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");
     edtSetting->style = " class='numInp' ";
-    myPID = new PID(&input, &output, &setpoint, .5, .1, 0, DIRECT);
+    myPID = new PID(&input, &output, &setpoint, .1, .01, 0, DIRECT);
     PID_GUI = new PID_Module ( id+"pid", myPID );
   }
   void setUpLogger()

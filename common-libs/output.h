@@ -483,6 +483,7 @@ class ModbusRelay: public HardwareOutput{
     void update(){
       if (lastValue != value ){
       unsigned long tmr = millis();
+      Serial.println("Writing to Modbus Relay "+String(relayNumber));
       nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
       
       Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
@@ -527,8 +528,8 @@ class ModbusVFD: public HardwareOutput {
             nodeRelays.writeSingleRegister(0x1000,1,slaveID );
           if (type==VFD_Types::MOLLOM_B20){
             nodeRelays.writeSingleRegister(0x2000,0x12,slaveID );
-            if (!nodeRelays.readHoldingRegisters(0x2100,1,slaveID))
-            Serial.println(nodeRelays.getResponseBuffer(0));
+            //if (!nodeRelays.readHoldingRegisters(0x2100,1,slaveID))
+            //Serial.println(nodeRelays.getResponseBuffer(0));
           }
           //running=true;
         }
@@ -552,17 +553,19 @@ class ModbusVFD: public HardwareOutput {
 class ModbusLed: public HardwareOutput {
   public:
     ModbusLed ( int _slaveID ){ slaveID=_slaveID;}
-    void update(float v){ value = v ;}
+    void update(float v){ value = v ;update();}
     void update(){
-      //if (ModbusRTUClient.available)
-      Serial.print("trying to send to Modbus Led: value:"+String(value)+" result: ");
-      //ModbusRTUClient.setTimeout(50);
+
+      int r=nodeRelays.writeSingleCoil(2,on,slaveID ); // GPIO 2 es el built in led
+      Serial.println("trying to send to Modbus Led: value:"+String(on)+" result: "+String(r));
+      on = !on;
       ;
       
       //Serial.println(ModbusRTUClient.coilWrite(slaveID, 0x0000, value));
     }
   private:
     int slaveID;
+    bool on=false;
 };
 // ########################################
 //  PWM
