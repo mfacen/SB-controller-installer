@@ -52,8 +52,8 @@ public:
       logger->addInput(bombaTimer);
       //Serial.println(logger->name);
       firstRun = false;
-    }
     onoffswitch->value ? bombaTimer->enable() : bombaTimer->stop();
+    }
     bombaTimer->update();
     valvulaPanel->update(!onoffswitch->value);
          // Serial.println(onoffswitch->value);
@@ -327,7 +327,7 @@ public:
     s += pressure->getHtml();
     s += edtSetting->getHtml();
     s += speedCtrlPanel->getHtml();
-    s += PID_GUI->getHtml();
+    //s += PID_GUI->getHtml();
     s += tmrVenturi->getHtml();
     //s += oxigen->getHtml();
     // s+=edtMinOxy->getHtml();

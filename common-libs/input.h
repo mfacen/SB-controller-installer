@@ -906,6 +906,7 @@ public:
       strTime->update(postValue);
       output->update(0);
       index = 0; // if any change then reset index
+      lastCheck=millis();
     }
     if (e == chkState)
     {

@@ -104,7 +104,7 @@ public:
       while (mapFile.available())
       {
         String line = mapFile.readStringUntil('\n');
-        if (!line || line==String('\n')) break;
+        if (!line || line==String('\n') || line=="") break;
         String parameter = line.substring(0, line.indexOf(","));
         String value = line.substring(line.indexOf(",") + 1, line.length());
         if (value == "")
