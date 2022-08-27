@@ -1,7 +1,7 @@
 
 #include "../common-libs/header.h"
 
-#define DEVICE_NAME "main-controller"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
+#define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "1.25"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
@@ -36,7 +36,7 @@ ModbusRelay RelayFeederFeedInf(1,15);
 ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
-ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
+ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
 //ModbusLed mdLed (4);
 
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);

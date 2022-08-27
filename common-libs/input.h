@@ -862,12 +862,14 @@ public:
       editbox_Time->update(strTime->text);
       firstRun = false;
       output->update(0);
+      index = 0;
       chkState->update();
       running = (bool) chkState->getValue();
+      lastCheck = millis();
     }
     if (running)
     {
-      if ((millis() - lastCheck) > ((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt() * 1000)
+      if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
       {
         value = !value;
         output->update(value);
@@ -908,8 +910,8 @@ public:
     if (e == chkState)
     {
       Serial.println(postValue);
-      if (postValue=="1") running = true;
-      else {running = false;index=0;value=0;}
+      if (postValue=="1") {running = true; lastCheck = millis();}
+      else {stop();}
     }
     return "";
   }
@@ -922,7 +924,8 @@ public:
   {
     running = false;
     output->update(0);
-    //value = 0;
+    value = 0;
+    index=0;
   }
   void update(float f)
   {
