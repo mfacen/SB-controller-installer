@@ -99,6 +99,7 @@ void postTransmission()
 #define SerialCtrlPin D3
 #endif
 enum VFD_Types { SOYAN_SVD , MOLLOM_B20 };
+enum GENERIC_TIMER_TYPES { TIMER , SCHEDULE };
 
 String mqttServer = "192.168.1.115";
 #include "classes.h"

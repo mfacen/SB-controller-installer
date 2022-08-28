@@ -15,10 +15,8 @@ function btnClickText(elementName, elementValue) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             console.log("btnClickText-->  "+this.responseText);
-            //evaluate(this.responseText);
         }
     }
-    //console.log (window.args); // NO EXISTE !!!!! PORQUE ???
     xhttp.open('GET', 'btnClick?button=' + elementName + '&value=' + elementValue + '', true); xhttp.send();
 }
 

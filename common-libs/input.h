@@ -838,9 +838,12 @@ public:
     name = _name;
     id = _id;
     output = o;
-    editbox_Time = new EditBox(id + "edt", "", "text", this);
-    chkState = new SavedEdit("ON/OFF",id + "chk", "/status.sta","checkbox", this);
-    editbox_Time->setStyle (" class='numInp'");
+    edt_Shedule = new EditBox(id + "edt", "", "text", this);
+    edt_OnTime = new EditBox(id + "edtOn", "", "time", this);
+    edt_OffTime = new EditBox(id + "edtOff", "", "time", this);
+    chkState = new SavedEdit("ON/OFF",id + "chkS", "/status.sta","checkbox", this);
+    chkMode = new SavedEdit("Schedule/Temp",id + "chkM", "/status.sta","checkbox", this);
+    edt_Shedule->setStyle (" class='numInp'");
     strTime = new savedVariable(id + "eTi");
     strTime->setFile("/status.sta");
     parent=e;
@@ -848,8 +851,10 @@ public:
   }
   String getHtml()
   {
-    return "<div class='card'><h4>" + name + "</h4>"+chkState->getHtml()+"Time Schedule" +
-             editbox_Time->getHtml() + "<br>Status: "+label->getHtml() +
+    return "<div class='card'><h4>" + name + "</h4>"+
+    chkState->getHtml()+chkMode->getHtml()+"Time Schedule" +
+             edt_Shedule->getHtml() + edt_OnTime->getHtml() + edt_OffTime->getHtml()+
+             "<br>Status: "+label->getHtml() +
              "</div>";
 
   }
@@ -859,7 +864,7 @@ public:
     if (firstRun)
     {
       strTime->update();
-      editbox_Time->update(strTime->text);
+      edt_Shedule->update(strTime->text);
       firstRun = false;
       output->update(0);
       index = 0;
@@ -869,21 +874,41 @@ public:
     }
     if (running)
     {
-      if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
-      {
-        value = !value;
-        output->update(value);
-        index = strTime->text.indexOf('-', index) + 1;
-        if (index < 0){
-          index = 0;
-          output->update(0);
-        }
-        // if (index == 0)
-        //   output->update(0);
-        if (id== "csbmbedt")
-        Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
-                        " value: "+String(value));
-        lastCheck = millis();
+      if (!chkMode->value) {     //  MODE SCHEDULE 
+          
+          if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
+          {
+            value = !value;
+            output->update(value);
+            index = strTime->text.indexOf('-', index) + 1;
+            if (index < 0){
+              index = 0;
+              output->update(0);
+            }
+            // if (index == 0)
+            //   output->update(0);
+            if (id== "csbmbedt")
+            Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
+                            " value: "+String(value));
+            lastCheck = millis();
+          }
+      }
+      else {                      // MODE TIME OF DAY
+            bool reversed=false;
+           reversed = (edt_OnTime->text > edt_OffTime->text); // in case onTime < offTime
+           //Serial.println(edt_OnTime->text.substring(3,5));
+          if ( (hour()>edt_OnTime->text.substring(0,2).toInt() &&
+             minute()>edt_OnTime->text.substring(3,5).toInt()) && 
+             (hour()<edt_OffTime->text.substring(0,2).toInt() &&
+             minute()<edt_OffTime->text.substring(3,5).toInt()) 
+              )
+              {
+              output->update(reversed); value = reversed;
+             }
+            else {
+              output->update(!reversed); value = !reversed;
+            }
+
       }
     }
     else
@@ -901,7 +926,7 @@ public:
 
   String postCallBack(ElementsHtml *e, String postValue)
   {
-    if (e == editbox_Time)
+    if (e == edt_Shedule)
     {
       strTime->update(postValue);
       output->update(0);
@@ -933,15 +958,18 @@ public:
     output->update(f);
     value = f;
   }
-  void update(String sss) { editbox_Time->update(sss); }
+  void update(String sss) { edt_Shedule->update(sss); }
 
 private:
   Label *label;
   String unit = "";
   HardwareOutput *output;
   savedVariable *strTime;
-  EditBox *editbox_Time;
+  EditBox *edt_Shedule;
+  EditBox *edt_OnTime;
+  EditBox *edt_OffTime;
   SavedEdit * chkState;
+  SavedEdit * chkMode;
   unsigned long lastCheck;
   int index = 0;
   bool running = true;
