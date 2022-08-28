@@ -841,8 +841,8 @@ public:
     edt_Shedule = new EditBox(id + "edt", "", "text", this);
     edt_OnTime = new EditBox(id + "edtOn", "", "time", this);
     edt_OffTime = new EditBox(id + "edtOff", "", "time", this);
-    chkState = new SavedEdit("ON/OFF",id + "chkS", "/status.sta","checkbox", this);
-    chkMode = new SavedEdit("Schedule/Temp",id + "chkM", "/status.sta","checkbox", this);
+    chkState = new SavedEdit("ON / OFF",id + "chkS", "/status.sta","checkbox", this);
+    chkMode = new SavedEdit("Timer / Hours",id + "chkM", "/status.sta","checkbox", this);
     edt_Shedule->setStyle (" class='numInp'");
     strTime = new savedVariable(id + "eTi");
     strTime->setFile("/status.sta");
@@ -895,22 +895,28 @@ public:
       }
       else {                      // MODE TIME OF DAY
             bool reversed=false;
-           reversed = (edt_OnTime->text > edt_OffTime->text); // in case onTime < offTime
-           //Serial.println(edt_OnTime->text.substring(3,5));
-          if ( (hour()>edt_OnTime->text.substring(0,2).toInt() &&
-             minute()>edt_OnTime->text.substring(3,5).toInt()) && 
-             (hour()<edt_OffTime->text.substring(0,2).toInt() &&
-             minute()<edt_OffTime->text.substring(3,5).toInt()) 
-              )
+           int onTime = String(edt_OnTime->text.substring(0,2)+edt_OnTime->text.substring(3,5)).toInt();
+           int offTime = String(edt_OffTime->text.substring(0,2)+edt_OffTime->text.substring(3,5)).toInt();
+           int nowTime = String(String(hour())+(minute()<10?"0":"")+String(minute())).toInt();
+           reversed = (onTime > offTime); // in case onTime < offTime
+           Serial.println(onTime);
+           Serial.println(offTime);
+           Serial.println(nowTime);
+           Serial.println(reversed);
+            
+          if (( nowTime>onTime) &&  (nowTime<=offTime) )
               {
-              output->update(reversed); value = reversed;
+              output->update(!reversed); value = !reversed;
+              Serial.println("true");
              }
             else {
-              output->update(!reversed); value = !reversed;
+              output->update(reversed); value = reversed;
+                            Serial.println("false");
+
             }
 
-      }
-    }
+      }  //  end of if chkMode == Timer
+    } //        END OF IF running
     else
     {
       //     if ( (millis()-lastCheck)  > (offTime->value*1000)) {
@@ -938,6 +944,10 @@ public:
       Serial.println(postValue);
       if (postValue=="1") {running = true; lastCheck = millis();}
       else {stop();}
+    }
+    if (e==chkMode){
+      lastCheck=millis();
+      index=0;
     }
     return "";
   }
