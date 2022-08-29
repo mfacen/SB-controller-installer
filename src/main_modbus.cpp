@@ -37,7 +37,7 @@ ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-//ModbusLed mdLed (4);
+ModbusLed mdLed (4);
 
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
 Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
@@ -87,7 +87,7 @@ void setup()
     
     spdInf.init();
     spdSup.init();
-    logger.addInput(&clarificadorInf);
+    //logger.addInput(&clarificadorInf);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
     //page.addElement(&vfdInf);
@@ -148,7 +148,7 @@ void loop()
 
     if (millis() - lastCheck > 5000)
     {
-                //mdLed.update();
+                mdLed.update();
                 lastCheck = millis();
     }
 }

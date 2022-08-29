@@ -107,27 +107,7 @@ class RS485_Device: public HardwareOutput {
 //    PubSubClient mqtt(&wifiClient);
     float lastValue;
 };
-// ########################################
-//  MODBUS DEVICE 
-// ########################################
-class Modbus_device: public HardwareInput {
-  public:
-    Modbus_device (int _slaveNumber,int _pinNumber) {
-      //node.begin(SerialInterface);
-      slaveNumber=_slaveNumber;
-      pinNumber = _pinNumber;
-    //ModbusRTUServer.configureCoils(0x00,1);
-    }
-    void update(){
-        Serial.println(String(millis()));
-          value= nodeRelays.readInputRegisters(slaveNumber,pinNumber,1);
-        Serial.println(String(millis()) + "read value:" +String(value));
-    }
-  void loop(){}
-  private:
-  //ModbusMaster node;
-  int slaveNumber,pinNumber;
-};
+
 
 // ########################################
 //  EZO_Oxygen

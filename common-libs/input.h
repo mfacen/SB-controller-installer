@@ -22,6 +22,7 @@
 // class ElementsHtml;
 #include <../common-libs/hardwareInput.h>
 
+
 class Input : public ElementsHtml, Subject
 {
 
@@ -40,6 +41,41 @@ public:
   }
 };
 
+// ########################################
+//  MODBUS DEVICE 
+// ########################################
+class Modbus_wrapper: public Input {
+  public:
+  uint8_t readInputValue(uint8_t fc, uint16_t address, uint16_t length) {
+    // read analog input
+    for (int i = 0; i < length; i++) {
+        slave->writeRegisterToBuffer(i, input->value);
+    }
+
+    return STATUS_OK;
+}
+    Modbus_wrapper (int _slaveNumber,Input *_input) {
+      //node.begin(SerialInterface);
+      slaveNumber=_slaveNumber;
+      //pinNumber = _pinNumber;
+    //ModbusRTUServer.configureCoils(0x00,1);
+    input=_input;
+    slave = new Modbus ( 4 , 12);//12 es D6 en esp6266
+    slave->begin(9600);
+    //slave->cbVector[CB_READ_REGISTERS] = readInputValue;
+    }
+    void update(){
+        Serial.println(String(millis()));
+          //value= nodeRelays.readInputRegisters(slaveNumber,pinNumber,1);
+          slave->writeRegisterToBuffer(0,input->value);
+        Serial.println(String(millis()) + "read value:" +String(value));
+        input->update();
+    }
+  private:
+  Input *input;
+    Modbus *slave;
+  int slaveNumber,pinNumber;
+};
 // ########################################
 //  BUTTON HTML
 // ########################################
@@ -346,6 +382,7 @@ public:
       //Serial.println(id+":"+String(value));
 
   }
+  String getText (){return variable->text;}
   void update(String s)
   {
     variable->update(s);
@@ -839,8 +876,8 @@ public:
     id = _id;
     output = o;
     edt_Shedule = new EditBox(id + "edt", "", "text", this);
-    edt_OnTime = new EditBox(id + "edtOn", "", "time", this);
-    edt_OffTime = new EditBox(id + "edtOff", "", "time", this);
+    edt_OnTime = new SavedEdit("On Time:",id + "edtOn", "", "time", this);
+    edt_OffTime = new SavedEdit("Off Time",id + "edtOff", "", "time", this);
     chkState = new SavedEdit("ON / OFF",id + "chkS", "/status.sta","checkbox", this);
     chkMode = new SavedEdit("Timer / Hours",id + "chkM", "/status.sta","checkbox", this);
     edt_Shedule->setStyle (" class='numInp'");
@@ -869,6 +906,9 @@ public:
       output->update(0);
       index = 0;
       chkState->update();
+      chkMode->update();
+      edt_OnTime->update();
+      edt_OffTime->update();
       running = (bool) chkState->getValue();
       lastCheck = millis();
     }
@@ -887,34 +927,34 @@ public:
             }
             // if (index == 0)
             //   output->update(0);
-            if (id== "csbmbedt")
-            Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
-                            " value: "+String(value));
+            // if (id== "csbmbedt")
+            // Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
+            //                 " value: "+String(value));
             lastCheck = millis();
           }
       }
       else {                      // MODE TIME OF DAY
             bool reversed=false;
-           int onTime = String(edt_OnTime->text.substring(0,2)+edt_OnTime->text.substring(3,5)).toInt();
-           int offTime = String(edt_OffTime->text.substring(0,2)+edt_OffTime->text.substring(3,5)).toInt();
+           int onTime = String(edt_OnTime->getText().substring(0,2)+edt_OnTime->getText().substring(3,5)).toInt();
+           int offTime = String(edt_OffTime->getText().substring(0,2)+edt_OffTime->getText().substring(3,5)).toInt();
            int nowTime = String(String(hour())+(minute()<10?"0":"")+String(minute())).toInt();
            reversed = (onTime > offTime); // in case onTime < offTime
-           Serial.println(onTime);
-           Serial.println(offTime);
-           Serial.println(nowTime);
-           Serial.println(reversed);
-            
-          if (( nowTime>onTime) &&  (nowTime<=offTime) )
-              {
-              output->update(!reversed); value = !reversed;
-              Serial.println("true");
-             }
-            else {
-              output->update(reversed); value = reversed;
-                            Serial.println("false");
+              //Serial.println(edt_OnTime->getText());
+          if (timeStatus() == timeSet) {
+            if (( nowTime>onTime) &&  (nowTime<=offTime) )
+                {
+                output->update(!reversed); value = !reversed;
+                //Serial.println("true");
+              }
+              else {
+                output->update(reversed); value = reversed;
+                   //           Serial.println("false");
 
-            }
-
+              }
+          }
+          else {
+            label->update("Time not Set");
+          }
       }  //  end of if chkMode == Timer
     } //        END OF IF running
     else
@@ -924,10 +964,10 @@ public:
       //       lastCheck = millis();
       //     }
     }
-    //if (lastValue!=output->value){
+    if (lastValue!=output->value){
       label->update(  (output->value ? "ON" : "OFF") );
       lastValue=output->value;
-    //}
+    }
   }
 
   String postCallBack(ElementsHtml *e, String postValue)
@@ -976,8 +1016,8 @@ private:
   HardwareOutput *output;
   savedVariable *strTime;
   EditBox *edt_Shedule;
-  EditBox *edt_OnTime;
-  EditBox *edt_OffTime;
+  SavedEdit *edt_OnTime;
+  SavedEdit *edt_OffTime;
   SavedEdit * chkState;
   SavedEdit * chkMode;
   unsigned long lastCheck;
