@@ -85,25 +85,32 @@ class MQTT_Device: public HardwareInput {
 
 
 // ########################################
-//  RS485 Device
+//  Modbus Device
 // ########################################
-class RS485_Device: public HardwareOutput {
+class Modbus_Device: public HardwareInput {
 
   public:
 
-   RS485_Device (String s ) { id = s;value=-1;}
+   Modbus_Device (String _id,int _slaveID ) { id = _id;value=-1;slaveID=_slaveID;}
    
     void update(){
-      if (lastValue!=value){
-      //  Serial.println("id="+id+",");
+      //if (lastValue!=value){
+            int error= (!nodeRelays.readHoldingRegisters(17,1,slaveID));//17 es A0 en esp8266
+                if(!error)      {value=(nodeRelays.getResponseBuffer(0));
+                                  Serial.println("Success writen to modbus, value = "+String(value));
+                                //nodeRelays.clearResponseBuffer();
+                                }
+                else         Serial.println("Error: "+String(error));
         //Serial.println("Serial sent from RS485 device "+ id+ ":" + String(value));
-      }
+      //}
     }
 
   void update(float v){value = v;}
 
   private:
     String id;
+    int slaveID;
+    
 //    PubSubClient mqtt(&wifiClient);
     float lastValue;
 };
