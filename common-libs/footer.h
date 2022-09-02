@@ -284,19 +284,15 @@ void generalLoop()
     //   while (SerialInterface.available () > 0)           // Esto he agregado para procesar entrada Serial
     //     processIncomingByte (SerialInterface.read ());   // Tambien lo puedo usar con Software Serial
 
-    //serialCom.loop();
     delay(50);
-    //ModbusRTUServer.poll();
+
     if ((currentMillis - lastUpdate) > 1000) //   EVERY SECOND       ###############
     {
         String ss = page.getJavaQueue(); // Get the JavaScript Queue from page
         // Serial.print("Javaqueue: ");Serial.println(ss);
         if (ss != "")
-            // webSocket.broadcastTXT(ss); //  WebSoket necesita una variable, no puedo poner page.getJavaQueue directamente
-            // Serial.print("Javaqueue:2 ");Serial.println(ss);
             lastUpdate = currentMillis;
         page.update();
-        // page.getJavaQueue();
     }
 
     if ((currentMillis - lastSaveTime) > 10000) //  EVERY 10 SECONDS #########
