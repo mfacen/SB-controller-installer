@@ -94,13 +94,14 @@ class Modbus_Device: public HardwareInput {
    Modbus_Device (String _id,int _slaveID ) { id = _id;value=-1;slaveID=_slaveID;}
    
     void update(){
+      modbus.readHoldingRegisters(slaveID,17,1);
       //if (lastValue!=value){
-            int error= (!nodeRelays.readHoldingRegisters(17,1,slaveID));//17 es A0 en esp8266
-                if(!error)      {value=(nodeRelays.getResponseBuffer(0));
-                                  Serial.println("Success writen to modbus, value = "+String(value));
-                                //nodeRelays.clearResponseBuffer();
-                                }
-                else         Serial.println("Error: "+String(error));
+            // int error= 1;//(!nodeRelays.readHoldingRegisters(17,1,slaveID));//17 es A0 en esp8266
+            //     if(!error)      {value=0;//(nodeRelays.getResponseBuffer(0));
+            //                       Serial.println("Success writen to modbus, value = "+String(value));
+            //                     //nodeRelays.clearResponseBuffer();
+            //                     }
+            //     else         Serial.println("Error: "+String(error));
         //Serial.println("Serial sent from RS485 device "+ id+ ":" + String(value));
       //}
     }

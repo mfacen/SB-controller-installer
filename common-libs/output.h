@@ -482,11 +482,12 @@ class ModbusRelay: public HardwareOutput{
    }
     void update(){
       if (lastValue != value ){
-      unsigned long tmr = millis();
-      Serial.println("Writing to Modbus Relay "+String(relayNumber));
-      nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
-      
-      Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
+      //unsigned long tmr = millis();
+      //Serial.println("Writing to Modbus Relay "+String(relayNumber));
+      //nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
+                  modbus.writeSingleHoldingRegister(gSlaveID,relayNumber,(value?0x0100:0x0200));
+
+      //Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
       }
     }
@@ -513,21 +514,27 @@ class ModbusVFD: public HardwareOutput {
         if (value==0) {
         running = false;
         if (type==VFD_Types::SOYAN_SVD)
-          nodeRelays.writeSingleRegister(0x1000,5, slaveID );
+          //nodeRelays.writeSingleRegister(0x1000,5, slaveID );
+            modbus.writeSingleHoldingRegister(slaveID,0x1000,5);
         if (type==VFD_Types::MOLLOM_B20)
-          nodeRelays.writeSingleRegister(0x2000,1, slaveID );
+            modbus.writeSingleHoldingRegister(slaveID,0x2000,1);
+          //nodeRelays.writeSingleRegister(0x2000,1, slaveID );
         }
         else {
           if (type==VFD_Types::SOYAN_SVD)
-            nodeRelays.writeSingleRegister(0x2000,value * 100  ,slaveID);
+            //nodeRelays.writeSingleRegister(0x2000,value * 100  ,slaveID);
+            modbus.writeSingleHoldingRegister(slaveID,0x2000,value*100);
           if (type==VFD_Types::MOLLOM_B20)
-            nodeRelays.writeSingleRegister(0x2001,value * 100  ,slaveID);
+            //nodeRelays.writeSingleRegister(0x2001,value * 100  ,slaveID);
+            modbus.writeSingleHoldingRegister(slaveID,0x2001,value*100);
 
         if (!running){
           if (type==VFD_Types::SOYAN_SVD)
-            nodeRelays.writeSingleRegister(0x1000,1,slaveID );
+            //nodeRelays.writeSingleRegister(0x1000,1,slaveID );
+            modbus.writeSingleHoldingRegister(slaveID,0x1000,1);
           if (type==VFD_Types::MOLLOM_B20){
-            nodeRelays.writeSingleRegister(0x2000,0x12,slaveID );
+            //nodeRelays.writeSingleRegister(0x2000,0x12,slaveID );
+            modbus.writeSingleHoldingRegister(slaveID,0x2000,0x12);
             //if (!nodeRelays.readHoldingRegisters(0x2100,1,slaveID))
             //Serial.println(nodeRelays.getResponseBuffer(0));
           }
@@ -556,8 +563,8 @@ class ModbusLed: public HardwareOutput {
     void update(float v){ value = v ;update();}
     void update(){
 
-      int r=nodeRelays.writeSingleCoil(2,on,slaveID ); // GPIO 2 es el built in led
-      Serial.println("trying to send to Modbus Led: value:"+String(on)+" result: "+String(r));
+      //int r=nodeRelays.writeSingleCoil(2,on,slaveID ); // GPIO 2 es el built in led
+      //Serial.println("trying to send to Modbus Led: value:"+String(on)+" result: "+String(r));
       on = !on;
       ;
       

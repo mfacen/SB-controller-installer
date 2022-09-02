@@ -41,10 +41,10 @@
 #include <PID_v1.h>
 //#include <ArduinoRS485.h> //  ESTA LIBRERIA LA TUVE QUE MODIFICAR !!!!
 //#include <ArduinoModbus.h>
-#include <ModbusMaster.h>
+//#include <ModbusMaster.h>
+#include <esp32ModbusRTU.h>
 #include <ModbusSlave.h>
-
-ModbusMaster nodeRelays;
+//ModbusMaster nodeRelays;
 #ifdef ESP32
 #define MAX485_DE      4
 #define MAX485_RE_NEG  4
@@ -98,6 +98,7 @@ void postTransmission()
 #define SerialInterface Serial
 #define SerialCtrlPin D3
 #endif
+esp32ModbusRTU modbus(&SerialInterface, 4);  // use Serial1 and pin 16 as RTS
 enum VFD_Types { SOYAN_SVD , MOLLOM_B20 };
 enum GENERIC_TIMER_TYPES { TIMER , SCHEDULE };
 

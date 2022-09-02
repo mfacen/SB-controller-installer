@@ -83,7 +83,16 @@ void setup()
     startUpWifi();
     //Serial2.begin(115200, SERIAL_8N1, 16, 17);
     SerialInterface.begin(9600, SERIAL_8N1, 16, 17);
-    nodeRelays.begin(SerialInterface);
+    //nodeRelays.begin(SerialInterface);
+    modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
+    Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
+    for (size_t i = 0; i < length; ++i) {
+      Serial.printf("%02x", data[i]);
+    }
+    std::reverse(data, data + 4);  // fix endianness
+    Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
+    Serial.print("\n\n");
+  });
     savedVariable::init();
     
     spdInf.init();
