@@ -305,7 +305,7 @@ public:
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
     edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");
     edtSetting->style = " class='numInp' ";
-    myPID = new PID(&input, &output, &setpoint, .1, .01, 0, DIRECT);
+    myPID = new PID(&input, &output, &setpoint, .05, .01, 0, DIRECT);
     PID_GUI = new PID_Module ( id+"pid", myPID );
   }
   void setUpLogger()
@@ -352,10 +352,14 @@ public:
       input = vent_bars->value;
       setpoint = edtSetting->value;
       myPID->Compute();
-       //Serial.println(input);
-       //Serial.println(setpoint);
-       //Serial.println(output);
-       //Serial.println();
+      Serial.print(name);
+      Serial.print(": ");
+       Serial.print(input);
+      Serial.print(": ");
+       Serial.print(setpoint);
+      Serial.print(": ");
+       Serial.print(output);
+       Serial.println();
       speedCtrlPanel->update(output);
     }
     else

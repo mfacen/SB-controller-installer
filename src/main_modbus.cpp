@@ -37,9 +37,9 @@ ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-ModbusLed mdLed (4);
-Modbus_Device anIn("AnalogIn",4);
-GenericInputPanel modbusIn ("Neme","",&anIn);
+//ModbusLed mdLed (4);
+//Modbus_Device anIn("AnalogIn",4);
+//GenericInputPanel modbusIn ("Neme","",&anIn);
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
 Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
@@ -96,7 +96,7 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Superior</h3><div>");
-    page.addElement(&modbusIn);
+    //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
     page.addElement(&spdSup);
     page.addString("<div class='card'>");
@@ -149,7 +149,7 @@ void loop()
 
     if (millis() - lastCheck > 5000)
     {
-                mdLed.update();
+                //mdLed.update();
                 lastCheck = millis();
     }
 }
