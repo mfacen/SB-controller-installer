@@ -91,7 +91,7 @@ class Modbus_Device: public HardwareInput {
 
   public:
 
-   Modbus_Device (String _id,int _slaveID ) { id = _id;value=-1;slaveID=_slaveID;}
+   Modbus_Device (String _id,int _slaveID ) { id = _id;value=-1;slaveID=_slaveID;list.push_back(this);}
    
     void update(){
       modbus.readHoldingRegisters(slaveID,17,1);
@@ -107,14 +107,27 @@ class Modbus_Device: public HardwareInput {
     }
 
   void update(float v){value = v;}
-
+  int getSlaveId (){return slaveID;}
+  static Modbus_Device* checkSlaveIDs(int _id,float _val){
+    for (unsigned int i = 0; i < list.size(); i++)
+    {
+      if (list[i]->getSlaveId() == _id)
+      {
+         list[i]->update(_val);
+         Serial.println("Updating from modbus "+list[i]->id);
+      };
+    };
+    return 0;
+    }
   private:
     String id;
     int slaveID;
     
 //    PubSubClient mqtt(&wifiClient);
     float lastValue;
+    static std::vector <Modbus_Device*> list;
 };
+std::vector<Modbus_Device *> Modbus_Device::list;
 
 
 // ########################################
