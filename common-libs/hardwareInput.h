@@ -109,8 +109,11 @@ class Modbus_Device: public HardwareInput {
   void update(float v){value = v;}
   int getSlaveId (){return slaveID;}
   static Modbus_Device* checkSlaveIDs(int _id,float _val){
+    Serial.printf("Size %02x",list.size());
+    Serial.println("IOOIHOIHOIHJO");
     for (unsigned int i = 0; i < list.size(); i++)
     {
+      Serial.println(list[i]->id);
       if (list[i]->getSlaveId() == _id)
       {
          list[i]->update(_val);

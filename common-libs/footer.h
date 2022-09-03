@@ -173,7 +173,7 @@ void startUpWifi()
     Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
     Serial.print("\n\n");
 
-    Modbus_Device::checkSlaveIDs (serverAddress,*reinterpret_cast<float*>(data));
+    Modbus_Device::checkSlaveIDs (serverAddress,data[0]);
   });
   modbus.onError([](esp32Modbus::Error error) {
     Serial.printf("Modbus error: 0x%02x\n\n", static_cast<uint8_t>(error));
