@@ -565,7 +565,8 @@ class ModbusLed: public HardwareOutput {
 
       //int r=nodeRelays.writeSingleCoil(2,on,slaveID ); // GPIO 2 es el built in led
                   modbus.writeSingleHoldingRegister(slaveID,0x02,on);
-
+                /// AQUI NO FUNCIONA PORQUE NO IMPLEMENTA WRITE COILS !!!
+                
       //Serial.println("trying to send to Modbus Led: value:"+String(on)+" result: "+String(r));
       on = !on;
       ;

@@ -59,7 +59,6 @@ public:
          // Serial.println(onoffswitch->value);
 
   }
-
 private:
   HardwareOutput *bomba;
   HardwareOutput *electroV;
@@ -313,6 +312,7 @@ public:
     logger->addInput(speedCtrlPanel);
     //logger->addInput(oxigen);
     logger->addInput(edtSetting);
+    logger->addInput(pressure);
   }
   void init()
   {
@@ -376,6 +376,7 @@ public:
     return NULL;
   }
   String returnDebugValue(){ return String(pressure->value)+"-"+String(speedCtrlPanel->value);}
+  float getPressure(){return pressure->value;}
 
 private:
   HardwareInput *vent_bars;
@@ -391,6 +392,7 @@ private:
   PID *myPID;
   //PID_Module *PID_GUI;
   double input, output, setpoint;
+
 };
 
 //#######################################################################

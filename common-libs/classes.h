@@ -638,6 +638,7 @@ public:
   {
     if (WiFi.status() == WL_CONNECTED)
     {
+      Serial.println("Trying to send Alarm !!!");
       String payload = "";
       String address = MapFile::lookUpMap("mqttServer", "/settings.set");
       String a;

@@ -108,7 +108,7 @@ class Modbus_Device: public HardwareInput {
 
   void update(float v){value = v;}
   int getSlaveId (){return slaveID;}
-  static Modbus_Device* checkSlaveIDs(int _id,float _val){
+  static void checkSlaveIDs(int _id,float _val){
     Serial.printf("Size %02x",list.size());
     Serial.println("IOOIHOIHOIHJO");
     for (unsigned int i = 0; i < list.size(); i++)
@@ -120,7 +120,7 @@ class Modbus_Device: public HardwareInput {
          Serial.println("Updating from modbus "+list[i]->id);
       };
     };
-    return 0;
+    
     }
   private:
     String id;
