@@ -392,7 +392,7 @@ public:
       index++;
       //Serial.println("Added: "+i->name);
     }
-    else {Serial.println("ERROR LIMIT OF PAGE ELEMENTS REACHED !!!!!!!!!!");ESP.restart();}
+    else {Serial.println("ERROR LIMIT OF LOGER ELEMENTS REACHED !!!!!!!!!!");}
   }
   // void addOutput ( Output *o ) { if (indexO<9) {outputArray[indexO]=o;indexO++;}}
   // void setCombo(int index) { comboBox->update(index); }
@@ -508,7 +508,7 @@ public:
         for (int i = 0; i < index; i++)
         {
           tempLog.print(inputArray[i]->id);
-          Serial.println(inputArray[i]->id);
+          //Serial.println(inputArray[i]->id);
           if ((i != index - 1) || (indexF != 0))
             tempLog.print(",");
         }
@@ -838,7 +838,18 @@ public:
           }
         }
       }
-
+    void printInputs(){
+      for (int i = 0; i < index; i++)
+        {
+          Serial.print(inputArray[i]->getId());Serial.print(":");
+          Serial.println(inputArray[i]->value);          
+        }
+        for (int i = 0; i < indexF; i++)
+        {
+          Serial.print(variableArray[i]->name); Serial.print(":");
+          Serial.println(variableArray[i]->value);
+      }
+    }
     private:
       HTTPClient client;
       WiFiClient *wifiClient;

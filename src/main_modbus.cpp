@@ -38,9 +38,9 @@ ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-ModbusLed mdLed (4);
-Modbus_Device anIn("AnalogIn",4);
-GenericInputPanel modbusIn ("Neme","",&anIn);
+//ModbusLed mdLed (4);
+//Modbus_Device anIn("AnalogIn",4);
+//GenericInputPanel modbusIn ("Neme","",&anIn);
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
 Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
@@ -98,7 +98,11 @@ void setup()
     
     spdInf.init();
     spdSup.init();
-    //logger.addInput(&clarificadorInf);
+    //Serial.println(spdInf.pressure->id);
+    logger.addInput(spdInf.pressure);
+    logger.addInput(spdSup.pressure);
+    logger.addInput(&lucesInf);
+    //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
     //page.addElement(&vfdInf);
@@ -106,12 +110,14 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Superior</h3><div>");
-    page.addElement(&modbusIn);
+    //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
     page.addElement(&spdSup);
     page.addString("<div class='card'>");
     page.addElement(&residuosSup);
     page.addElement(&skimmer_sup);
+    page.addElement(&lucesSup);
+    page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
     page.addString("</div>");
    // page.addString("</div><div class=''>");
@@ -123,6 +129,8 @@ void setup()
     page.addString("<div class='card'>");
     page.addElement(&residuosInf);
     page.addElement(&skimmer_inf);
+    page.addElement(&lucesInf);
+    page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
     page.addString("</div>");
     //page.addString("</div><div class=''>");
@@ -162,13 +170,14 @@ void loop()
 
     if (millis() - lastCheck > 5000)
     {
-                mdLed.update();
-                        if (spdInf.getPressure()<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
-                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()));
+                //mdLed.update();
+                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
+                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
                             lastAlarmInf = millis(); }
-                        if (spdSup.getPressure()<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
-                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()));
+                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
+                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
                             lastAlarmSup = millis();}
                 lastCheck = millis();
+                logger.printInputs();
     }
 }
