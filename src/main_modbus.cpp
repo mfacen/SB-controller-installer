@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "1.251"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "1.255"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -37,7 +37,7 @@ ModbusRelay RelayFeederFeedInf(1,15);
 ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
-ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
+ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
 //ModbusLed mdLed (4);
 //Modbus_Device anIn("AnalogIn",4);
 //GenericInputPanel modbusIn ("Neme","",&anIn);
@@ -48,26 +48,26 @@ Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 AnalogIn pressureSensorInf (36);
 AnalogIn pressureSensorSup (39);
 
-Set switchBlowerSup("Blower", "bls", &RelayBlowerSup);
-Set switchBlowerInf("Blower", "bls", &RelayBlowerInf);
+Set switchBlowerSup("Blower_Sup", "bls", &RelayBlowerSup);
+Set switchBlowerInf("Blower_Inf", "bli", &RelayBlowerInf);
 
-Set skimmer_sup("Skimmer Sup", "skmSup", &SkmSup);
-Set skimmer_inf("Skimmer Inf", "skmInf", &SkmInf);
+Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
+Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
 
-Feeder feederSup("Alimentador Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
-Feeder feederInf("Alimentador Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
+Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
+Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
 
-GenericTimer residuosSup("Residuos Sup", "rs", &relayResiduosSup);
-GenericTimer residuosInf("Residuos Inf", "ri", &relayResiduosInf);
+GenericTimer residuosSup("Residuos_Sup", "rs", &relayResiduosSup);
+GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
 
-GenericTimer lucesSup("Luces Sup", "ls", &relayLucesSup);
-GenericTimer lucesInf("Luces Inf", "li", &relayLucesInf);
+GenericTimer lucesSup("Luces_Sup", "ls", &relayLucesSup);
+GenericTimer lucesInf("Luces_Inf", "li", &relayLucesInf);
 
-Clarificador clarificadorSup("Clarificador Sup", "cs", &bombaClarSup, &evClarSup, &logger);
-Clarificador clarificadorInf("Clarificador Inf", "ci", &bombaClarInf, &evClarInf, &logger);
+Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger);
+Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger);
 
-Speed_Control spdSup("Speed Ctrl Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
-Speed_Control spdInf("Speed Ctrl Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
+Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
+Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
 
 #include "../common-libs/footer.h"
 
@@ -99,9 +99,10 @@ void setup()
     spdInf.init();
     spdSup.init();
     //Serial.println(spdInf.pressure->id);
-    logger.addInput(spdInf.pressure);
-    logger.addInput(spdSup.pressure);
-    logger.addInput(&lucesInf);
+    logger.addInput(&residuosInf);
+    logger.addInput(&residuosSup);
+    logger.addInput(&clarificadorInf);
+    logger.addInput(&clarificadorSup);
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
@@ -172,12 +173,11 @@ void loop()
     {
                 //mdLed.update();
                         if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
-                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
+                            alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
                             lastAlarmInf = millis(); }
                         if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
-                            alarma.alarm("ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
+                            alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
                             lastAlarmSup = millis();}
                 lastCheck = millis();
-                logger.printInputs();
     }
 }

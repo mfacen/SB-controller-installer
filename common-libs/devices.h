@@ -49,7 +49,7 @@ public:
       onoffswitch->update();
       valvulaPanel->update(onoffswitch->value);
       //logger->addInput(valvulaPanel);    // El problema esta en el MQTT !!!!! Ahora lo he apagado en footer linea 274
-      //logger->addInput(bombaTimer);
+      logger->addInput(bombaTimer);
       //Serial.println(logger->name);
       firstRun = false;
     onoffswitch->value ? bombaTimer->enable() : bombaTimer->stop();
@@ -156,7 +156,7 @@ public:
   {
     if (firstRun)
     {
-      //setLogger();
+      setLogger();
       weight->update();
       interval->update();
       rate->update();
@@ -166,7 +166,9 @@ public:
       millisStart->update(millis()); // Resetear millisStart ????????????????????? Directamente hacer variable normal
       air->update(0);
       feed->update(0);
-      dispensed->update((servings->value - feedNumber->value) * weight->value / servings->value);
+      servings->value?
+        dispensed->update((servings->value - feedNumber->value) * weight->value / servings->value):
+        dispensed->update(0);
     }
     //  { weight->update();interval->update();rate->update();running->update();servings->update();
     //             state->update();airTime->update();feedNumber->update();feedTime->update(); iddleTime->update();firstRun=false;}
@@ -299,7 +301,7 @@ public:
     //oxigen = new GenericOutputPanel("Oxigeno", id + "ox", "mg/l", oxi,this);
     speedCtrl = _hardwareOutput;
     fakeOut = new FakeOutput();
-    speedCtrlPanel = new GenericOutputPanel("Vent_speed", id + "spd", "%", speedCtrl,false,this,false);
+    speedCtrlPanel = new GenericOutputPanel(id+"_speed", id + "spd", "%", speedCtrl,false,this,false);
     tmrVenturi = new GenericTimer("Venturi Timer", id + "tVen", fakeOut,this);
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
     edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");
@@ -311,10 +313,10 @@ public:
   }
   void setUpLogger()
   {
-    //logger->addInput(speedCtrlPanel);
+    logger->addInput(speedCtrlPanel);
     //logger->addInput(oxigen);
-    //logger->addInput(edtSetting);
-    Serial.println("Press id:" +pressure->id);
+    logger->addInput(edtSetting);
+    //Serial.println("Press id:" +pressure->id);
     logger->addInput(pressure);
   }
   GenericInputPanel* getPressure(){return pressure;}
@@ -342,7 +344,7 @@ public:
   {
     if (firstRun)
     {
-       //setUpLogger();
+      setUpLogger();
       firstRun = false;
       setpoint = vent_bars->value;
       edtSetting->update();
@@ -382,8 +384,8 @@ public:
   String returnDebugValue(){ return String(pressure->value)+"-"+String(speedCtrlPanel->value);}
   //float getPressure(){return pressure->value;}
 
-  GenericInputPanel *pressure;
 private:
+  GenericInputPanel *pressure;
   HardwareInput *vent_bars;
   GenericOutputPanel *oxigen;
   HardwareOutput *speedCtrl;

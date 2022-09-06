@@ -389,8 +389,8 @@ public:
     if (index <= 29)
     {
       inputArray[index] = i;
+      //Serial.println("Added: "+inputArray[index]->name);
       index++;
-      //Serial.println("Added: "+i->name);
     }
     else {Serial.println("ERROR LIMIT OF LOGER ELEMENTS REACHED !!!!!!!!!!");}
   }
@@ -431,7 +431,7 @@ public:
       {
         for (int i = 0; i < index; i++)
         {
-          inputArray[i]->update();
+          //inputArray[i]->update();
         }
         // pause->setInterval(interval);
         logData();
@@ -480,6 +480,9 @@ public:
 
   int getInterval() { return interval; }
 
+//##################################################################
+//##################        L O G       D A T A   ##################
+//##################################################################
   bool logData()
   {
     bool r = false;
@@ -507,8 +510,8 @@ public:
         tempLog.print("Time,");
         for (int i = 0; i < index; i++)
         {
-          tempLog.print(inputArray[i]->id);
-          //Serial.println(inputArray[i]->id);
+          tempLog.print(inputArray[i]->name);
+          Serial.println("Logging column "+inputArray[i]->name);
           if ((i != index - 1) || (indexF != 0))
             tempLog.print(",");
         }
@@ -711,51 +714,7 @@ public:
         return success;
       }
 
-      bool uploadToPi()
-      {
-        String payload;
-        bool success = false;
-        String a = MapFile::lookUpMap("mqttServer", "/settings.set");
-        // String a="http://192.168.0.109/capturas/fileUpload.php?fileName=" + fileName;
-        // String a = "http://michel.atarraya.dev/capturas/fileUpload.php?fileName=" + fileName;
-
-        if (a == "")
-          a = "192.168.0.1";
-        for (int i = 0; i < index; i++)
-        {
-          String address = "http://" + a;
-          if (inputArray[i]->endpoint)
-          {
-            address += "/" + inputArray[i]->endpoint;
-            // address+= "?UnixTime="+String(now());
-            address += "?TypeId=" + String(inputArray[i]->typeID);
-            address += "&Measurement=" + String(inputArray[i]->value);
-            Serial.println(address);
-            if (client.begin(*wifiClient, address)) // ,443,"/",sha1))  Atencion he leido que no se puede usar begin sin WiFiClient
-            {
-              Serial.println("Posting sensor data.");
-              client.GET();
-
-              payload = client.getString(); // Get the response payload
-
-              // Serial.println("ServerSend: " + data);
-              Serial.println("Payload: " + payload);
-              // Serial.println("- done");
-              // client.begin(*wifiClient,"http://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage?chat_id=1461925075&text="+
-              //             id+" : " + name+" logged data.");
-              //            client.GET();
-
-              // disconnect when done
-              Serial.println("Disconnecting from server...");
-              // Serial.println("- bye!");
-            }
-          }
-        }
-        client.end();
-
-        return success;
-      }
-
+      
       bool uploadLiveData()
       {
         String a = MapFile::lookUpMap("serverName", "/settings.set");
@@ -841,7 +800,7 @@ public:
     void printInputs(){
       for (int i = 0; i < index; i++)
         {
-          Serial.print(inputArray[i]->getId());Serial.print(":");
+          Serial.print(inputArray[i]->getName());Serial.print(":");
           Serial.println(inputArray[i]->value);          
         }
         for (int i = 0; i < indexF; i++)
@@ -854,7 +813,7 @@ public:
       HTTPClient client;
       WiFiClient *wifiClient;
       String fileNameUpload = "defaultName.csv";
-      ElementsHtml *inputArray[30];
+      loggableInterface *inputArray[30];
       // Output* outputArray[10];
       savedVariable *variableArray[10];
       float inputArrayLastSave[10];

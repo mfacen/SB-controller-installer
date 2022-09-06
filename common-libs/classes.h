@@ -144,18 +144,31 @@ private:
 
 class DebugModule;
 
+class loggableInterface{
+  public:
+    String name;
+    String id;
+    // String descriptor;
+    float value = 0;
+    String getName() { return name; }
+    String getId() { return id; }
+    float getValue() { return value; }
+    void setId(String i) { id = i; }
+    void setName(String n) { name = n; }
+      MQTTClient *mq = NULL;
+    void sendMqtt() { mq->publish(name, String(value)), "pi", "pass"; }
+    void setMqtt(MQTTClient *_mq) { mq = _mq; }
+    bool getMqtt() { return mq ? true : false; }
+};
 //##################################################
 //            ELEMENTS HTML
 //##################################################
-class ElementsHtml : public Subject
+class ElementsHtml : public Subject, public loggableInterface
 {
 public:
   ~ElementsHtml(){}; // destructor...     todas las clases abstractas deben tener un destructor definido.
                      // static Page page;
-  String name;
-  String id;
-  // String descriptor;
-  float value = 0;
+
   String style = "";
   bool visible = true;
   bool firstRun = true;
@@ -169,11 +182,7 @@ public:
   void setEndpoint(String _endpoint) { endpoint = _endpoint; }
 
   // Wrapper* wrapper = nullptr;
-  String getName() { return name; }
-  String getId() { return id; }
-  float getValue() { return value; }
-  void setId(String i) { id = i; }
-  void setName(String n) { name = n; }
+  
   void setStyle(String s) { style = s; }
   void setVisible(bool v) { v ? javaQueue.add(docIdStr + this->id + "').style.display='inline';") : javaQueue.add(docIdStr + id + "').style.display='none';"); } //{visible=v;}
   void setDisabled(bool v)
@@ -200,10 +209,7 @@ public:
   static std::vector<ElementsHtml *> allHTMLElements;
   static void pushElement(ElementsHtml *e) { allHTMLElements.push_back(e); }
   static void deleteElement(ElementsHtml *e) {} //  Todavia no he implementado esto
-  MQTTClient *mq = NULL;
-  void sendMqtt() { mq->publish(name, String(value)), "pi", "pass"; }
-  void setMqtt(MQTTClient *_mq) { mq = _mq; }
-  bool getMqtt() { return mq ? true : false; }
+
   
 private:
 };
@@ -558,6 +564,8 @@ public:
         {
           const String uStr = payload;         // "http://"+address+"/Update/"+payload;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           Serial.println("Updating: " + uStr); //  EL PROGRAMA YA ES MAS GRANDE QUE LA MITAD DEL FLASH !!!!!!!!!!
+        if (FILE_SYS.exists("/capturas/"+fileName));
+            FILE_SYS.remove("/capturas/"+fileName);
 #ifdef ESP8266
           t_httpUpdate_return ret = ESPhttpUpdate.update(wifiClient, uStr); // ret = ESPhttpUpdate.update( uStr ); //AQUI HE APAGADO HABIA PROBLEMAS de MEMORIA !!!!
 #endif

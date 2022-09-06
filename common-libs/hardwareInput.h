@@ -2,7 +2,7 @@
 //#include <PubSubClient.h>
 
 
-class HardwareInput
+class HardwareInput// : public loggableInterface
 {
 public:
   float factor = 1;
