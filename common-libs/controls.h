@@ -86,12 +86,12 @@ public:
     // Tengo que crear un archivo temporal hasta que funcione el truncate del ESP32. !!!!!
     File mapFile; File tempFlie;
     #ifdef ESP8266
-    LittleFS.exists(file.c_str()) ? mapFile = LittleFS.open(file, "r+") : mapFile = LittleFS.open(file, "r+");
+    LittleFS.exists(file.c_str()) ? mapFile = LittleFS.open(file, "r+") : mapFile = LittleFS.open(file, "w+");
     #endif
     #ifdef ESP32
     FILE_SYS.exists(file.c_str()) ? 
       mapFile = FILE_SYS.open(file, "r+") : 
-      mapFile = FILE_SYS.open(file, "r+");
+      mapFile = FILE_SYS.open(file, "w+");
     #endif
     //Serial.println(file + String(mapFile));
     String outputString;

@@ -653,15 +653,15 @@ public:
 
             String header = f.readStringUntil('\n');
             data += header; //+"\n";
-            // Serial.println("header: -"+header+"-");
+             Serial.println("header: -"+header+"-");
             f.seek(partial + header.length());
             while (f.available())
             {
               String line = (f.readStringUntil('\n'));
               data.concat(line + "\n");
 
-              // Serial.println(line);
-              if (data.length() > 500)
+               //Serial.println(line);
+              if (data.length() > 5000) // ATENCION CON ESTO LO HE CAMBIADO PORQUE NO FUNCIONA BIEN
               {
                 partial += data.length() - header.length();
                 break;
@@ -679,10 +679,9 @@ public:
               Serial.println("PostResult:" + String((int)client.POST(data)));
             }
             // Serial.println(' = Result');
-            //{ client.POST ("DUMMY DATA" ); Serial.println('sending...');}
             payload = client.getString(); // Get the response payload
 
-            // Serial.println("ServerSend: " + data);
+             Serial.println("ServerSend: " + data);
             Serial.println("Payload: " + payload);
             // Serial.println("- done");
             // client.begin(*wifiClient,"http://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage?chat_id=1461925075&text="+
@@ -696,20 +695,12 @@ public:
           client.end(); // ULTIMA MODIFICACION estaba antes de la corchea antes
           if (partial != 0)
             Serial.println("Uploaded partial data, partial = " + String(partial));
-#ifdef ESP8266
           if ((payload.substring(0, 8) == "SUCCESS.") && (partial == 0))
           {
-            LittleFS.remove("capturas/" + fileName);
+            FILE_SYS.remove("/capturas/" + fileName);
             success = true;
           }
-#endif
-#ifdef ESP32
-          if ((payload.substring(0, 8) == "SUCCESS.") && (partial == 0))
-          {
-            SPIFFS.remove("capturas/" + fileName);
-            success = true;
-          }
-#endif
+
         }
         return success;
       }

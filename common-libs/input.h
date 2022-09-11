@@ -1078,7 +1078,7 @@ public:
     if (firstRun){
       firstRun = false;
       columnName->update();
-      if (columnName->text!="") id=columnName->text;
+      if (columnName->text!="" && columnName->text!=" ") {id=columnName->text;name=id;}
       else columnName->update(id);
     }
     if (input)
@@ -1159,7 +1159,7 @@ public:
     if (firstRun){
       firstRun = false;
       columnName->update();
-      if (columnName->text!="") id=columnName->text;
+      if (columnName->text!="" && columnName->text!=" ") {id=columnName->text;name=id;}
       else columnName->update(id);
     }
     label->update(value);
