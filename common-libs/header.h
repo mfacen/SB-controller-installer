@@ -32,6 +32,7 @@
     #define FILE_SYS SPIFFS
     //#define REQUEST_ request->
     #define REQUEST_ server.
+    #include <esp32ModbusRTU.h>
 
 #endif
 #include <OneWire.h>
@@ -42,7 +43,6 @@
 //#include <ArduinoRS485.h> //  ESTA LIBRERIA LA TUVE QUE MODIFICAR !!!!
 //#include <ArduinoModbus.h>
 //#include <ModbusMaster.h>
-#include <esp32ModbusRTU.h>
 #include <ModbusSlave.h>
 //ModbusMaster nodeRelays;
 #ifdef ESP32
@@ -92,13 +92,13 @@ void postTransmission()
 #ifdef ESP32 
 #define SerialInterface Serial2
 #define SerialCtrlPin 4
+esp32ModbusRTU modbus(&SerialInterface, 4);  // use Serial1 and pin 16 as RTS
 
 #endif
 #ifdef ESP8266
 #define SerialInterface Serial
 #define SerialCtrlPin D3
 #endif
-esp32ModbusRTU modbus(&SerialInterface, 4);  // use Serial1 and pin 16 as RTS
 enum VFD_Types { SOYAN_SVD , MOLLOM_B20 };
 enum GENERIC_TIMER_TYPES { TIMER , SCHEDULE };
 
