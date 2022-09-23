@@ -878,7 +878,7 @@ public:
     edt_Shedule = new EditBox(id + "edt", "", "text", this);
     edt_OnTime = new SavedEdit("On Time:",id + "edtOn", "", "time", this);
     edt_OffTime = new SavedEdit("Off Time",id + "edtOff", "", "time", this);
-    chkState = new SavedEdit("ON / OFF",id + "chkS", "/status.sta","checkbox", this);
+    chkState = new SavedEdit("on/off",id + "chkS", "/status.sta","checkbox", this);
     chkMode = new SavedEdit("Timer / Hours",id + "chkM", "/status.sta","checkbox", this);
     edt_Shedule->setStyle (" class='numInp'");
     strTime = new savedVariable(id + "eTi");
@@ -1060,7 +1060,7 @@ public:
     s += " id='";
     s += id;
     s += "'><h4>";
-    s += name;
+    s += id;
     s += "</h4>";
     if (allow_change_name) s+= btnID->getHtml();
     s += label->getHtml();
@@ -1180,7 +1180,7 @@ public:
     s += " id='";
     s += id;
     s += "'><h4>";
-    s += name;
+    s += id;
     s += "</h4>";
     if (allow_name_change) s+= btnID->getHtml();
     s+="<br>";
