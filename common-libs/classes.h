@@ -564,8 +564,10 @@ public:
         {
           const String uStr = payload;         // "http://"+address+"/Update/"+payload;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           Serial.println("Updating: " + uStr); //  EL PROGRAMA YA ES MAS GRANDE QUE LA MITAD DEL FLASH !!!!!!!!!!
-        if (FILE_SYS.exists("/capturas/"+fileName));
-            FILE_SYS.remove("/capturas/"+fileName);
+        if (FILE_SYS.exists("/capturas/"+fileName+".csv"));
+            FILE_SYS.remove("/capturas/" + fileName+".csv");
+        //if (FILE_SYS.exists("/status.sta"));
+         //   FILE_SYS.remove("/status.sta");
 #ifdef ESP8266
           t_httpUpdate_return ret = ESPhttpUpdate.update(wifiClient, uStr); // ret = ESPhttpUpdate.update( uStr ); //AQUI HE APAGADO HABIA PROBLEMAS de MEMORIA !!!!
 #endif

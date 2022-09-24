@@ -10,7 +10,7 @@ public:
     id = _id;
     bomba = _bomba; // new DigitalOutput ( pinBomba, id+"bomba", true );
     electroV = _ev; // new DigitalOutput ( pinElectrovalvula, id+"ev", true );
-    bombaTimer = new GenericTimer("Bomba", id + "bmb", bomba);
+    bombaTimer = new GenericTimer(id+"_Bomba", id + "bmb", bomba);
     valvulaPanel = new GenericOutputPanel("Electro Valve", id + "_EV", "", electroV, false,this,false);
     onoffswitch = new SavedEdit("on/off",id + "edt","/status.sta", "checkbox", this);
     //running = new savedVariable(id + "running");
@@ -304,7 +304,7 @@ public:
     speedCtrlPanel = new GenericOutputPanel(id+"_speed", id + "spd", "%", speedCtrl,false,this,false);
     tmrVenturi = new GenericTimer("Venturi Timer", id + "tVen", fakeOut,this);
     edtMinOxy = new EditBox(id + "MinOxy", "MinimumOxygen", "number");
-    edtSetting = new SavedEdit("Setting", id + "edtSet", "/status.sta", "number");
+    edtSetting = new SavedEdit("Set_"+id, id + "edtSet", "/status.sta", "number");
     edtSetting->style = " class='numInp' ";
     myPID = new PID(&input, &output, &setpoint, .05, .01, 0, DIRECT);
     //PID_GUI = new PID_Module ( id+"pid", myPID );

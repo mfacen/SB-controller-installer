@@ -481,6 +481,7 @@ class ModbusRelay: public HardwareOutput{
      relayNumber = _relayNumber;
    }
     void update(){
+      #ifdef ESP32
       if (lastValue != value ){
       //unsigned long tmr = millis();
       //Serial.println("Writing to Modbus Relay "+String(relayNumber));
@@ -490,6 +491,7 @@ class ModbusRelay: public HardwareOutput{
       //Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
       }
+      #endif
     }
     void update (float v){value=v;update();}
   private:
@@ -507,6 +509,8 @@ class ModbusVFD: public HardwareOutput {
     ModbusVFD ( int _slaveID , int _type=0){ slaveID=_slaveID;type=_type;}
     void update(float v){ value = v ;update();}
     void update(){
+            #ifdef ESP32
+
       if (lastValue!=value){
         //Serial.println("Trying to write to VFD modbus value=" + String(value));
         unsigned long tmr = millis();
@@ -545,6 +549,7 @@ class ModbusVFD: public HardwareOutput {
 
         lastValue = value;
       }
+      #endif
     }
   private:
     int slaveID;
@@ -564,9 +569,9 @@ class ModbusLed: public HardwareOutput {
     void update(){
 
       //int r=nodeRelays.writeSingleCoil(2,on,slaveID ); // GPIO 2 es el built in led
+      #ifdef ESP32
                   modbus.writeSingleHoldingRegister(slaveID,0x02,on);
-                /// AQUI NO FUNCIONA PORQUE NO IMPLEMENTA WRITE COILS !!!
-                
+      #endif
       //Serial.println("trying to send to Modbus Led: value:"+String(on)+" result: "+String(r));
       on = !on;
       ;
