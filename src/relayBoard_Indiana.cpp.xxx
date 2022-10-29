@@ -1,5 +1,5 @@
 
-#include "../../SharpBox/include/header.h"
+#include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardIn"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "1.23"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -16,12 +16,11 @@ DirCapture dirCapture("dCapt", "/capturas");
 RS485Main serialCom(&page); // Esta es la #DEFINICION srlCtrlPin en todo el programa.
 //ModbusLed ledModbus ( 1 );
 //Set modLedSet ("Led","idLed",&ledModbus);
-ModbusRelay modbusRelay (1,1);
-Set relayModbus ("ee","_id",&modbusRelay);
-DigitalOutput evClarSup(13, "evCs", true); // VV
-DigitalOutput bombaClarSup(33, "rlyCs", true);
-DigitalOutput evClarInf(27, "evCs", true); // VV
-DigitalOutput bombaClarInf(32, "rlyCs", true);
+//Set relayModbus ("ee","_id",&modbusRelay);
+DigitalOutput evClarSup(13, "evCs", false); // VV
+DigitalOutput bombaClarSup(33, "rlyCs", false);
+DigitalOutput evClarInf(27, "evCs", false); // VV
+DigitalOutput bombaClarInf(32, "rlyCi", false);
 DigitalOutput bombaResiduosSup(26, "rlyRS", false);
 DigitalOutput bombaResiduosInf(25, "rlyRi", false);
 DigitalOutput SkmSup(15, "rlysks", false);
@@ -37,7 +36,7 @@ Clarificador clarificadorSup("Clarificador Sup", "cs", &bombaClarSup, &evClarSup
 Clarificador clarificadorInf("Clarificador Inf", "ci", &bombaClarInf, &evClarInf, &logger);
 
 
-#include "../../SharpBox/include/footer.h"
+#include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");
@@ -51,7 +50,15 @@ void setup()
 {
     startUpWifi();
     SerialInterface.begin(9600, SERIAL_8N1, 16, 17);
-    node.begin(1,SerialInterface);
+    modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
+    Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
+    for (size_t i = 0; i < length; ++i) {
+      Serial.printf("%02x", data[i]);
+    }
+    std::reverse(data, data + 4);  // fix endianness
+    Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
+    Serial.print("\n\n");
+  });
     savedVariable::init();
     page.addElement(&lblTime);
     page.addString("<p>"
@@ -60,7 +67,7 @@ void setup()
                     "<div><div class='divMain'><h3>Tanque Superior</h3><br>");
     //page.addElement(&modLedSet);
     page.addString("<div class=' card'>");
-    page.addElement(&relayModbus);
+    //page.addElement(&relayModbus);
     page.addElement(&clarificadorSup);
     page.addElement(&residuosSup);
     page.addElement(&skimmer_sup);

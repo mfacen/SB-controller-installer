@@ -651,6 +651,8 @@ public:
             // client.addHeader("Content-Length", "100");
             String data;
 
+            f.seek(0);
+
             String header = f.readStringUntil('\n');
             data += header; //+"\n";
              Serial.println("header: -"+header+"-");
@@ -660,14 +662,15 @@ public:
               String line = (f.readStringUntil('\n'));
               data.concat(line + "\n");
 
-               //Serial.println(line);
-              if (data.length() > 5000) // ATENCION CON ESTO LO HE CAMBIADO PORQUE NO FUNCIONA BIEN
+                //Serial.println(line);
+              if (data.length() > 500) // ATENCION CON ESTO LO HE CAMBIADO PORQUE NO FUNCIONA BIEN
               {
                 partial += data.length() - header.length();
+                Serial.println("Partial: "+String(partial));
                 break;
               }
             }
-            if (f.position() == f.size())
+            if (f.position() >= f.size())
             {
               partial = 0;
             }
@@ -681,7 +684,7 @@ public:
             // Serial.println(' = Result');
             payload = client.getString(); // Get the response payload
 
-             Serial.println("ServerSend: " + data);
+            Serial.println("Data to send to server: " + data);
             Serial.println("Payload: " + payload);
             // Serial.println("- done");
             // client.begin(*wifiClient,"http://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage?chat_id=1461925075&text="+

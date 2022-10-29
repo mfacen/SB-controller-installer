@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "1.268"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "1.272"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -38,6 +38,7 @@ ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
+//ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
 //ModbusLed mdLed (4);
 //Modbus_Device anIn("AnalogIn",4);
 //GenericInputPanel modbusIn ("Neme","",&anIn);
@@ -63,8 +64,8 @@ GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
 GenericTimer lucesSup("Luces_Sup", "ls", &relayLucesSup);
 GenericTimer lucesInf("Luces_Inf", "li", &relayLucesInf);
 
-Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger);
-Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger);
+Clarificador clarificadorSup("Cl_S", "cs", &bombaClarSup, &evClarSup, &logger);
+Clarificador clarificadorInf("Cl_I", "ci", &bombaClarInf, &evClarInf, &logger);
 
 Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
@@ -101,8 +102,8 @@ void setup()
     //Serial.println(spdInf.pressure->id);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
-    logger.addInput(&clarificadorInf);
-    logger.addInput(&clarificadorSup);
+    //logger.addInput(&clarificadorInf);
+    //logger.addInput(&clarificadorSup);
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
@@ -110,22 +111,9 @@ void setup()
     page.addString("<p>"
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
-                    "<h3>Tanque Superior</h3><div>");
+                    "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
-    page.addElement(&spdSup);
-    page.addString("<div class='card'>");
-    page.addElement(&residuosSup);
-    page.addElement(&skimmer_sup);
-    page.addElement(&lucesSup);
-    page.addString("</div><div class='card'>");
-    page.addElement(&clarificadorSup);
-    page.addString("</div>");
-   // page.addString("</div><div class=''>");
-    page.addElement(&feederSup);
-    page.addString("</div><h3>Tanque Inferior</h3><div>");
-    //page.addString("<h3>Tanque Inferior</h3>");//<div class='divMain'>");
-    //page.addString("<div class=''>");
     page.addElement(&spdInf);
     page.addString("<div class='card'>");
     page.addElement(&residuosInf);
@@ -136,6 +124,16 @@ void setup()
     page.addString("</div>");
     //page.addString("</div><div class=''>");
     page.addElement(&feederInf);
+    page.addString("</div><h3>Tanque Superior</h3><div>");
+    page.addElement(&spdSup);
+    page.addString("<div class='card'>");
+    page.addElement(&residuosSup);
+    page.addElement(&skimmer_sup);
+    page.addElement(&lucesSup);
+    page.addString("</div><div class='card'>");
+    page.addElement(&clarificadorSup);
+    page.addString("</div>");
+    page.addElement(&feederSup);
     page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
@@ -171,13 +169,12 @@ void loop()
 
     if (millis() - lastCheck > 5000)
     {
-                //mdLed.update();
-                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
-                            alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
-                            lastAlarmInf = millis(); }
-                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
-                            alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
-                            lastAlarmSup = millis();}
+                        // if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
+                        //     alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
+                        //     lastAlarmInf = millis(); }
+                        // if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
+                        //     alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
+                        //     lastAlarmSup = millis();}
                 lastCheck = millis();
     }
 }

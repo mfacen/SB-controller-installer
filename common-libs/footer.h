@@ -171,7 +171,7 @@ void startUpWifi()
   modbus.onError([](esp32Modbus::Error error) {
     Serial.printf("Modbus error: 0x%02x\n\n", static_cast<uint8_t>(error));
   });
-  modbus.begin();
+  modbus.begin();modbus.setTimeOutValue(1000);
   #endif
 }
 void printJavaQueue(Page page)
@@ -248,6 +248,7 @@ void loadPreferences()
     if (ss != "")
     {
         deviceID = ss;
+        page.setSubtitle(ss);
         logger.setFileName(ss + ".csv");
         updater.setFileName(ss);
         updater.setID(mdnsName);
