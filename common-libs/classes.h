@@ -306,6 +306,7 @@ public:
   }
   void addString(String s) { strings[elementCount] += s; }
   void setDebug(bool d) { debug = d; }
+  void setSubtitle(String st) { subTitle = st; }
   void deleteElement(int index)
   {
     for (int i = index; i < 49; i++)

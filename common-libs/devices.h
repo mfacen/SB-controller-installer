@@ -32,8 +32,7 @@ public:
   {
     if (e == onoffswitch)
     {
-      // onoffswitch->value== !onoffswitch->value;
-      //running->update(onoffswitch->value);
+      // onoffswitch->value== !onoffswitch->value;  
       valvulaPanel->update(!onoffswitch->value);
       onoffswitch->value ? bombaTimer->enable() : bombaTimer->stop();
       //Serial.println(running->value);
@@ -54,8 +53,10 @@ public:
       firstRun = false;
     onoffswitch->value ? bombaTimer->enable() : bombaTimer->stop();
     }
+    if (!onoffswitch->value) bombaTimer->stop();
     bombaTimer->update();
     valvulaPanel->update(!onoffswitch->value);
+    if (bombaTimer->value != lastValue) {logger->logData();lastValue=bombaTimer->value;}
          // Serial.println(onoffswitch->value);
 
   }
@@ -67,6 +68,7 @@ private:
   SavedEdit *onoffswitch;
   //savedVariable *running;
   Logger *logger;
+  float lastValue=0;
 };
 
 // ########################################

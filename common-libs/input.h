@@ -630,8 +630,9 @@ public:
     child = e;
     btnCalLow = new ButtonPrompt((child->id + ("btnLow")).c_str(), "Cal Low", this);
     btnCalHigh = new ButtonPrompt(child->id + "btnHigh", "Cal High", this);
+    btnResetCal = new Button(child->id + "btnReset", "Reset Cal", this);
   }
-  String getHtml() { return btnCalLow->getHtml() + btnCalHigh->getHtml(); }
+  String getHtml() { return btnCalLow->getHtml() + btnCalHigh->getHtml()+btnResetCal->getHtml(); }
 
   void init(float newData)
   {
@@ -684,6 +685,18 @@ public:
       MapFile::saveMap(child->id + "refHigh", String(refHigh), "/status.sta");
       MapFile::saveMap(child->id + "rawHigh", String(rawHigh), "/status.sta");
     }
+     if (e == btnResetCal)
+    {
+      refHigh = 0;
+      rawHigh = 0;
+      refLow = 0;
+      rawLow = 0;
+      //Serial.println("refHigh: "+ String(refHigh)+"    rawHigh: " + String(rawHigh));
+      MapFile::saveMap(child->id + "refHigh", String(refHigh), "/status.sta");
+      MapFile::saveMap(child->id + "rawHigh", String(rawHigh), "/status.sta");
+      MapFile::saveMap(child->id + "refLow", String(refLow), "/status.sta");
+      MapFile::saveMap(child->id + "rawLow", String(rawLow), "/status.sta");
+    }   
     return "";
   }
   void update() {}
@@ -693,6 +706,7 @@ private:
   String id;
   ButtonPrompt *btnCalLow;
   ButtonPrompt *btnCalHigh;
+  Button *btnResetCal;
   ElementsHtml *child;
   float refHigh = 0;
   float  refLow=0;
@@ -919,6 +933,7 @@ public:
           if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
           {
             value = !value;
+            //if (index=0) value = 0;
             output->update(value);
             index = strTime->text.indexOf('-', index) + 1;
             if (index < 0){
@@ -928,8 +943,8 @@ public:
             // if (index == 0)
             //   output->update(0);
             // if (id== "csbmbedt")
-            // Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
-            //                 " value: "+String(value));
+             Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
+                             " value: "+String(value));
             lastCheck = millis();
           }
       }
@@ -964,10 +979,10 @@ public:
       //       lastCheck = millis();
       //     }
     }
-    if (lastValue!=output->value){
+    //if (lastValue!=output->value){
       label->update(  (output->value ? "ON" : "OFF") );
       lastValue=output->value;
-    }
+    //}
   }
 
   String postCallBack(ElementsHtml *e, String postValue)
@@ -982,7 +997,7 @@ public:
     if (e == chkState)
     {
       Serial.println(postValue);
-      if (postValue=="1") {running = true; lastCheck = millis();}
+      if (postValue="1") {running = true; lastCheck = millis();}
       else {stop();}
     }
     if (e==chkMode){
@@ -994,6 +1009,7 @@ public:
   void enable()
   {
     running = true;
+    index=0;
     //value = 1;
   }
   void stop()
