@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "1.268"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "1.271"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -69,6 +69,8 @@ Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf
 Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
 
+SavedEdit alarmSup ( "Alarm Sup","aS","/status.sta","checkbox");
+SavedEdit alarmInf ( "Alarm Inf","aI","/status.sta","checkbox");
 #include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
