@@ -14,6 +14,12 @@ public:
    int typeID = 0;
 };
 
+class FakeHardwareInput : public HardwareInput{
+  public:
+  FakeHardwareInput(){}
+  void udpate(){};
+  void udpate(float v){value=v;};
+};
 
 // ########################################
 //  Analog IN

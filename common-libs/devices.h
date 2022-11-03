@@ -386,12 +386,12 @@ public:
   String returnDebugValue(){ return String(pressure->value)+"-"+String(speedCtrlPanel->value);}
   //float getPressure(){return pressure->value;}
 
+  FakeOutput *fakeOut;
 private:
   GenericInputPanel *pressure;
   HardwareInput *vent_bars;
   GenericOutputPanel *oxigen;
   HardwareOutput *speedCtrl;
-  FakeOutput *fakeOut;
   GenericOutputPanel *speedCtrlPanel;
   GenericTimer *tmrVenturi;
   EditBox *edtMinOxy;

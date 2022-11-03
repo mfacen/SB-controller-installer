@@ -64,14 +64,16 @@ GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
 GenericTimer lucesSup("Luces_Sup", "ls", &relayLucesSup);
 GenericTimer lucesInf("Luces_Inf", "li", &relayLucesInf);
 
-Clarificador clarificadorSup("Cl_S", "cs", &bombaClarSup, &evClarSup, &logger);
-Clarificador clarificadorInf("Cl_I", "ci", &bombaClarInf, &evClarInf, &logger);
+Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger);
+Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger);
 
 Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
 
-SavedEdit alarmSup ( "Alarm Sup","aS","/status.sta","checkbox");
-SavedEdit alarmInf ( "Alarm Inf","aI","/status.sta","checkbox");
+FakeOutput alrmInf;
+FakeOutput alrmSup;
+Set alarmSup ( "Alarm Sup","aS",&alrmSup);
+Set alarmInf ( "Alarm Inf","aI",&alrmInf);
 #include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
@@ -116,6 +118,7 @@ void setup()
                     "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
+    page.addElement(&alarmInf);
     page.addElement(&spdInf);
     page.addString("<div class='card'>");
     page.addElement(&residuosInf);
@@ -127,6 +130,7 @@ void setup()
     //page.addString("</div><div class=''>");
     page.addElement(&feederInf);
     page.addString("</div><h3>Tanque Superior</h3><div>");
+    page.addElement(&alarmSup);
     page.addElement(&spdSup);
     page.addString("<div class='card'>");
     page.addElement(&residuosSup);
@@ -171,12 +175,16 @@ void loop()
 
     if (millis() - lastCheck > 5000)
     {
-                        // if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
-                        //     alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
-                        //     lastAlarmInf = millis(); }
-                        // if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
-                        //     alarma.alarm(deviceID+" ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
-                        //     lastAlarmSup = millis();}
+              if (alarmInf.value) {
+                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
+                            lastAlarmInf = millis(); }
+              }
+              if (alarmSup.value) {
+                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
+                            lastAlarmSup = millis();}
                 lastCheck = millis();
+              }
     }
 }

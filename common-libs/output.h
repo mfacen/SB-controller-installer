@@ -17,6 +17,8 @@ public:
 };
 class FakeOutput: public HardwareOutput
 {
+  public:
+  FakeOutput(){};
   void update(){}
   void update(float f){value = f;}
 };

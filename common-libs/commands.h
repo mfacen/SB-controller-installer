@@ -161,7 +161,6 @@ private:
   // Button *btnON;
   // Button *btnOFF;
   // Label *label;
-  int value;
 };
 
 // #######################################
