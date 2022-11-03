@@ -12,7 +12,7 @@ public:
     electroV = _ev; // new DigitalOutput ( pinElectrovalvula, id+"ev", true );
     bombaTimer = new GenericTimer(id+"_Bomba", id + "bmb", bomba);
     valvulaPanel = new GenericOutputPanel("Electro Valve", id + "_EV", "", electroV, false,this,false);
-    onoffswitch = new SavedEdit("running",id + "edt","/status.sta", "checkbox", this);
+    onoffswitch = new SavedEdit("on/off",id + "edt","/status.sta", "checkbox", this);
     //running = new savedVariable(id + "running");
     //running->setFile("/status.sta");
     logger = _logger;

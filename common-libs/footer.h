@@ -317,7 +317,7 @@ void generalLoop()
         }
         lastSaveTime = millis();
         IPAddress ipBroadcast(myIP[0], myIP[1], myIP[2], 255);
-        String msg = "MDNS: " + String(mdnsName) + "\nIP: " + WiFi.localIP().toString() + "\nFile: " + deviceID + "\n\n";
+        String msg = "ID: " + String(mdnsName) + "\nIP: http://" + WiFi.localIP().toString() + "\nFile: " + deviceID + "\n\n";
         UDP.beginPacket(ipBroadcast, 1234);
         UDP.print(msg.c_str());
         UDP.endPacket();
@@ -1105,7 +1105,7 @@ void handleFileList()
                     argument.toCharArray(charBuf, stringLength);
                     // Serial.println(String(add));
                     msg = sendI2CCommand(add, argument);
-                    server.send(200, "text/plain", msg);
+                    server.send(200, "text/plain", "Reply: "+msg);
                 }
             }
 #endif
