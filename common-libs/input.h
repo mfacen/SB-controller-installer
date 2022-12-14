@@ -997,7 +997,7 @@ public:
     if (e == chkState)
     {
       Serial.println(postValue);
-      if (postValue="1") {running = true; lastCheck = millis();}
+      if (postValue=="1") {running = true; lastCheck = millis();}
       else {stop();}
     }
     if (e==chkMode){

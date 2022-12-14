@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "1.272"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.176"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -118,7 +118,6 @@ void setup()
                     "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
-    page.addElement(&alarmInf);
     page.addElement(&spdInf);
     page.addString("<div class='card'>");
     page.addElement(&residuosInf);
@@ -126,11 +125,11 @@ void setup()
     page.addElement(&lucesInf);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
+    page.addElement(&alarmInf);
     page.addString("</div>");
     //page.addString("</div><div class=''>");
     page.addElement(&feederInf);
     page.addString("</div><h3>Tanque Superior</h3><div>");
-    page.addElement(&alarmSup);
     page.addElement(&spdSup);
     page.addString("<div class='card'>");
     page.addElement(&residuosSup);
@@ -138,6 +137,7 @@ void setup()
     page.addElement(&lucesSup);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
+    page.addElement(&alarmSup);
     page.addString("</div>");
     page.addElement(&feederSup);
     page.addString("</div>");
