@@ -119,7 +119,7 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Inferior</h3><div>");
-    page.addElement(&modbusIn);
+    //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
     page.addElement(&spdInf);
     page.addString("<div class='card'>");
