@@ -89,13 +89,13 @@ public:
     btnStart = new Button(id + "bS", "Start", this);
     btnReset = new Button(id + "bR", "Reset", this);
     info = new Label(id + "lblInfo", "", this);
-    dispensed = new savedVariable(id + "Dispensed");
-    running = new savedVariable(id + "running");
-    millisStart = new savedVariable(id + "millisStart");
-    feedNumber = new savedVariable(id + "feedNumber");
-    feedTime = new savedVariable(id + "feedTime");
-    iddleTime = new savedVariable(id + "iddleTime");
-    state = new savedVariable(id + "state");
+    dispensed = new SavedVariable(id + "Dispensed");
+    running = new SavedVariable(id + "running");
+    millisStart = new SavedVariable(id + "millisStart");
+    feedNumber = new SavedVariable(id + "feedNumber");
+    feedTime = new SavedVariable(id + "feedTime");
+    iddleTime = new SavedVariable(id + "iddleTime");
+    state = new SavedVariable(id + "state");
     // setFeed = new GenericTimer ( "Feed", relayFeed );
     weight = new SavedEdit("Weight", id + "wEdt");
     interval = new SavedEdit("Interval", id + "Int");
@@ -259,7 +259,7 @@ private:
   HardwareOutput *relayFeed;
   HardwareOutput *relayAir;
   Set *blower;
-  savedVariable *dispensed; // used for Output to Logger
+  SavedVariable *dispensed; // used for Output to Logger
   Button *btnStart;
   Button *btnReset;
   Logger *logger;
@@ -269,12 +269,12 @@ private:
   SavedEdit *rate;
   SavedEdit *servings;
   SavedEdit *airTime;
-  savedVariable *running;
-  savedVariable *millisStart;
-  savedVariable *feedNumber;
-  savedVariable *feedTime;
-  savedVariable *iddleTime;
-  savedVariable *state;
+  SavedVariable *running;
+  SavedVariable *millisStart;
+  SavedVariable *feedNumber;
+  SavedVariable *feedTime;
+  SavedVariable *iddleTime;
+  SavedVariable *state;
   int temp_interval;
   Set *air, *feed;
   enum states
@@ -309,6 +309,8 @@ public:
     edtSetting = new SavedEdit("Set_"+id, id + "edtSet", "/status.sta", "number");
     edtSetting->style = " class='numInp' ";
     myPID = new PID(&input, &output, &setpoint, .05, .01, 0, DIRECT);
+    vfd_names[0]="Soyan";vfd_names[1]="Mollom";
+    cmbVFD_Type = new ComboBox ( id+"vfdType",2,vfd_names,this);
     //PID_GUI = new PID_Module ( id+"pid", myPID );
         //logger->addInput(pressure);
 
@@ -335,6 +337,7 @@ public:
     s += pressure->getHtml();
     s += edtSetting->getHtml();
     s += speedCtrlPanel->getHtml();
+    s += cmbVFD_Type->getHtml();
     //s += PID_GUI->getHtml();
     s += tmrVenturi->getHtml();
     //s += oxigen->getHtml();
@@ -350,6 +353,7 @@ public:
       firstRun = false;
       setpoint = vent_bars->value;
       edtSetting->update();
+      vfd->setType(cmbVFD_Type->value);
     }
     tmrVenturi->update();
     pressure->update();
@@ -373,7 +377,13 @@ public:
     else
       speedCtrlPanel->update(100);
   }
-  String postCallBack() { return ""; }
+  String postCallBack(ElementsHtml *e, String postValue ) {
+        Serial.println("postCallBack SpeedControl "+postValue);
+
+     if (e==cmbVFD_Type && vfd!=nullptr) vfd->setType(postValue.toInt());
+     return "";
+  }
+  void setVfd (ModbusVFD *_vfd){vfd=_vfd;}
   ElementsHtml *searchById(String _id)
   {
     if (_id == pressure->id)
@@ -398,9 +408,11 @@ private:
   SavedEdit *edtSetting;
   Logger *logger;
   PID *myPID;
+  ComboBox *cmbVFD_Type;
   //PID_Module *PID_GUI;
   double input, output, setpoint;
-
+    String vfd_names[2]; 
+  ModbusVFD *vfd;
 };
 
 //#######################################################################

@@ -197,14 +197,14 @@ public:
   }
 };
 
-class savedVariable 
+class SavedVariable 
 {
 public:
-  savedVariable(String _name) { name = _name;add(this); text=_name;}
+  SavedVariable(String _name) { name = _name;add(this); text=_name;}
 
-  static std::vector<savedVariable *> list; // esta lista estatica la he creado para hacerles init() a todas las 
+  static std::vector<SavedVariable *> list; // esta lista estatica la he creado para hacerles init() a todas las 
   static void init(){ for (auto *s :list) {s->update();}} //  variables que he creado.
-  static void add(savedVariable *var){
+  static void add(SavedVariable *var){
     list.push_back(var);
   }
   void setFile(String _file) { file = _file; }
@@ -246,8 +246,8 @@ public:
   float value = 0;
   String text;
 };
-String savedVariable::file = "/status.sta";
-std::vector<savedVariable *> savedVariable::list;
+String SavedVariable::file = "/status.sta";
+std::vector<SavedVariable *> SavedVariable::list;
 
 class PreferencesBinder
 {
@@ -372,89 +372,89 @@ public:
 // HE CREADO UN MODULO DE ALARMA MAS SIMPLE QUE SOLO SE CONECTA AL PI, LA DIRECCION ES LA MISMA QUE mqttServer.
 
 
-// #ifdef ESP8266
-// class TelegramAlarm
-// {
-// public:
-//   TelegramAlarm() {  }
-//    void alarm(String a)
-//   {
-//     //httpClient = new HTTPClient();
-//     httpClient.addHeader("Content-Type", "text/plain");
+#ifdef ESP8266
+class TelegramAlarm
+{
+public:
+  TelegramAlarm() {  }
+   void alarm(String a)
+  {
+    //httpClient = new HTTPClient();
+    httpClient.addHeader("Content-Type", "text/plain");
 
-//     String address = ("http://"+mqttServer+"/Update/alarm.php?msg='" + a + "'");
-//     if (a != "")
-//     {
-//       httpClient.begin(wifiClient,address);
-//       int err = httpClient.GET(); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
-//       Serial.println("Trying to reach messenger Address: "+address+" error: "+httpClient.errorToString(err));
-//     }
-//   }
+    String address = ("http://"+mqttServer+"/Update/alarm.php?msg='" + a + "'");
+    if (a != "")
+    {
+      httpClient.begin(wifiClient,address);
+      int err = httpClient.GET(); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
+      Serial.println("Trying to reach messenger Address: "+address+" error: "+httpClient.errorToString(err));
+    }
+  }
 
-// private:
-//   HTTPClient httpClient;
-//   WiFiClient wifiClient;
-// };
-// //HTTPClient *TelegramAlarm::httpClient;
-// #endif
-// #ifdef ESP32
-// const char* root_ca= \
+private:
+  HTTPClient httpClient;
+  WiFiClient wifiClient;
+};
+//HTTPClient *TelegramAlarm::httpClient;
+#endif
+#ifdef ESP32
+const char* root_ca= \
 
-// "-----BEGIN CERTIFICATE-----\n"
-// "MIIDxTCCAq2gAwIBAgIBADANBgkqhkiG9w0BAQsFADCBgzELMAkGA1UEBhMCVVMx\n"
-// "EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoT\n"
-// "EUdvRGFkZHkuY29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRp\n"
-// "ZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAwMFoXDTM3MTIzMTIz\n"
-// "NTk1OVowgYMxCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQH\n"
-// "EwpTY290dHNkYWxlMRowGAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjExMC8GA1UE\n"
-// "AxMoR28gRGFkZHkgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgLSBHMjCCASIw\n"
-// "DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL9xYgjx+lk09xvJGKP3gElY6SKD\n"
-// "E6bFIEMBO4Tx5oVJnyfq9oQbTqC023CYxzIBsQU+B07u9PpPL1kwIuerGVZr4oAH\n"
-// "/PMWdYA5UXvl+TW2dE6pjYIT5LY/qQOD+qK+ihVqf94Lw7YZFAXK6sOoBJQ7Rnwy\n"
-// "DfMAZiLIjWltNowRGLfTshxgtDj6AozO091GB94KPutdfMh8+7ArU6SSYmlRJQVh\n"
-// "GkSBjCypQ5Yj36w6gZoOKcUcqeldHraenjAKOc7xiID7S13MMuyFYkMlNAJWJwGR\n"
-// "tDtwKj9useiciAF9n9T521NtYJ2/LOdYq7hfRvzOxBsDPAnrSTFcaUaz4EcCAwEA\n"
-// "AaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYE\n"
-// "FDqahQcQZyi27/a9BUFuIMGU2g/eMA0GCSqGSIb3DQEBCwUAA4IBAQCZ21151fmX\n"
-// "WWcDYfF+OwYxdS2hII5PZYe096acvNjpL9DbWu7PdIxztDhC2gV7+AJ1uP2lsdeu\n"
-// "9tfeE8tTEH6KRtGX+rcuKxGrkLAngPnon1rpN5+r5N9ss4UXnT3ZJE95kTXWXwTr\n"
-// "gIOrmgIttRD02JDHBHNA7XIloKmf7J6raBKZV8aPEjoJpL1E/QYVN8Gb5DKj7Tjo\n"
-// "2GTzLH4U/ALqn83/B2gX2yKQOC16jdFU8WnjXzPKej17CuPKf1855eJ1usV2GDPO\n"
-// "LPAvTK33sefOT6jEm0pUBsV/fdUID+Ic/n4XuKxe9tQWskMJDE32p2u0mYRlynqI\n"
-// "4uJEvlz36hz1\n"
-// "-----END CERTIFICATE-----\n";
- //#include <UniversalTelegramBot.h>
-// #include <WiFiClientSecure.h>
-// class TelegramAlarm
-// {
-// public:
-//   static void alarm(String a)
-//   {
-//     httpClient = new HTTPClient();
-//     WiFiClientSecure wifiSecure;
-//       wifiSecure.setCACert(root_ca);
-//     //httpClient->addHeader("Content-Type", "application/x-www-form-urlencoded");
-//     httpClient->addHeader("Content-Type", "app/json");
-//     String address = ("https://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage");
-//     if (a != "")
-//     {
-//       int err=httpClient->begin(address,root_ca);
-//         UniversalTelegramBot bot("1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM", wifiSecure);
+"-----BEGIN CERTIFICATE-----\n"
+"MIIDxTCCAq2gAwIBAgIBADANBgkqhkiG9w0BAQsFADCBgzELMAkGA1UEBhMCVVMx\n"
+"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoT\n"
+"EUdvRGFkZHkuY29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRp\n"
+"ZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAwMFoXDTM3MTIzMTIz\n"
+"NTk1OVowgYMxCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQH\n"
+"EwpTY290dHNkYWxlMRowGAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjExMC8GA1UE\n"
+"AxMoR28gRGFkZHkgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgLSBHMjCCASIw\n"
+"DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL9xYgjx+lk09xvJGKP3gElY6SKD\n"
+"E6bFIEMBO4Tx5oVJnyfq9oQbTqC023CYxzIBsQU+B07u9PpPL1kwIuerGVZr4oAH\n"
+"/PMWdYA5UXvl+TW2dE6pjYIT5LY/qQOD+qK+ihVqf94Lw7YZFAXK6sOoBJQ7Rnwy\n"
+"DfMAZiLIjWltNowRGLfTshxgtDj6AozO091GB94KPutdfMh8+7ArU6SSYmlRJQVh\n"
+"GkSBjCypQ5Yj36w6gZoOKcUcqeldHraenjAKOc7xiID7S13MMuyFYkMlNAJWJwGR\n"
+"tDtwKj9useiciAF9n9T521NtYJ2/LOdYq7hfRvzOxBsDPAnrSTFcaUaz4EcCAwEA\n"
+"AaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYE\n"
+"FDqahQcQZyi27/a9BUFuIMGU2g/eMA0GCSqGSIb3DQEBCwUAA4IBAQCZ21151fmX\n"
+"WWcDYfF+OwYxdS2hII5PZYe096acvNjpL9DbWu7PdIxztDhC2gV7+AJ1uP2lsdeu\n"
+"9tfeE8tTEH6KRtGX+rcuKxGrkLAngPnon1rpN5+r5N9ss4UXnT3ZJE95kTXWXwTr\n"
+"gIOrmgIttRD02JDHBHNA7XIloKmf7J6raBKZV8aPEjoJpL1E/QYVN8Gb5DKj7Tjo\n"
+"2GTzLH4U/ALqn83/B2gX2yKQOC16jdFU8WnjXzPKej17CuPKf1855eJ1usV2GDPO\n"
+"LPAvTK33sefOT6jEm0pUBsV/fdUID+Ic/n4XuKxe9tQWskMJDE32p2u0mYRlynqI\n"
+"4uJEvlz36hz1\n"
+"-----END CERTIFICATE-----\n";
+ #include <UniversalTelegramBot.h>
+#include <WiFiClientSecure.h>
+class TelegramAlarm
+{
+public:
+  static void alarm(String a)
+  {
+    httpClient = new HTTPClient();
+    WiFiClientSecure wifiSecure;
+      wifiSecure.setCACert(root_ca);
+    //httpClient->addHeader("Content-Type", "application/x-www-form-urlencoded");
+    httpClient->addHeader("Content-Type", "app/json");
+    String address = ("https://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage");
+    if (a != "")
+    {
+      //int err=httpClient->begin(address,root_ca);
+        UniversalTelegramBot bot("1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM", wifiSecure);
 
-//       Serial.println("HttpClient begun, result: "+String(err));
-//       bot.sendMessage("1461925075",a);
-//       //err = httpClient->POST("{'chat_id':1461925075,'text':'"+a+"'}"); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
-//       //Serial.println("Trying to reach telegram, result: "+String(err));
-//     }
-//   }
+     // Serial.println("HttpClient begun, result: "+String(err));
+      bot.sendMessage("-891650240",a);
+      //err = httpClient->POST("{'chat_id':1461925075,'text':'"+a+"'}"); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
+      //Serial.println("Trying to reach telegram, result: "+String(err));
+    }
+  }
 
-// private:
-//   static HTTPClient *httpClient;
-//   //static WiFiClient *wifiClient;
-// };
-// HTTPClient *TelegramAlarm::httpClient;
-// //WiFiClient *TelegramAlarm::wifiClient;
-// #endif
+private:
+  static HTTPClient *httpClient;
+  //static WiFiClient *wifiClient;
+};
+HTTPClient *TelegramAlarm::httpClient;
+//WiFiClient *TelegramAlarm::wifiClient;
+#endif
 
 
 
