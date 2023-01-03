@@ -928,7 +928,7 @@ public:
     }
     if (running)
     {
-      if (!chkMode->value) {     //  MODE SCHEDULE 
+      if (!chkMode->value) {     //  MODE TIMER 
           
           if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
           {
@@ -944,7 +944,8 @@ public:
             //   output->update(0);
             // if (id== "csbmbedt")
              Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
-                             " value: "+String(value));
+                              " Check OnOff: "+String(chkState->value)+
+                             " value: "+String(value) +"  Running= "+String(running));
             lastCheck = millis();
           }
       }
@@ -997,8 +998,9 @@ public:
     if (e == chkState)
     {
       Serial.println(postValue);
-      if (postValue="1") {running = true; lastCheck = millis();}
-      else {stop();}
+      if (postValue=="1") {running = true; lastCheck = millis();    Serial.println("Running = TRUE");
+}
+      else {stop();lastCheck=millis();}
     }
     if (e==chkMode){
       lastCheck=millis();
@@ -1010,7 +1012,7 @@ public:
   {
     running = true;
     index=0;
-    //value = 1;
+    Serial.println("Running = FALSE");
   }
   void stop()
   {
