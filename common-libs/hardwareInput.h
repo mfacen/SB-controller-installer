@@ -101,7 +101,8 @@ class Modbus_Device: public HardwareInput {
    
     void update(){
       #ifdef ESP32
-      modbus.readHoldingRegisters(slaveID,17,1);
+      //modbus.readHoldingRegisters(slaveID,0,1);
+      modbus.readDiscreteInputs(4,17,1);
       #endif
       //if (lastValue!=value){
             // int error= 1;//(!nodeRelays.readHoldingRegisters(17,1,slaveID));//17 es A0 en esp8266

@@ -2,13 +2,14 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "1.272"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.176"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
 Page page("Shrimpbox Main Controller", "User interface");
 Updater updater(DEVICE_NAME, SOFT_VERSION);
-Alarm alarma;
+//Alarm alarma;
+TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
 LabelFreeHeap lblFreeHeap("lblHeap", "this");
 Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
@@ -39,9 +40,9 @@ ModbusRelay relayLucesInf(1,16);
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
 //ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-//ModbusLed mdLed (4);
-//Modbus_Device anIn("AnalogIn",4);
-//GenericInputPanel modbusIn ("Neme","",&anIn);
+ModbusLed mdLed (4);
+Modbus_Device anIn("AnalogIn",4);
+GenericInputPanel modbusIn ("ModbusIN","",&anIn);
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
 Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
@@ -99,7 +100,9 @@ void setup()
     Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
     Serial.print("\n\n");
   });
-    savedVariable::init();
+    SavedVariable::init();
+    spdInf.setVfd(&spdInfCtrl);
+    spdSup.setVfd(&spdSupCtrl);
     
     spdInf.init();
     spdSup.init();
@@ -118,7 +121,6 @@ void setup()
                     "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
    // page.addString("<div class=''>");
-    page.addElement(&alarmInf);
     page.addElement(&spdInf);
     page.addString("<div class='card'>");
     page.addElement(&residuosInf);
@@ -126,11 +128,11 @@ void setup()
     page.addElement(&lucesInf);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
+    page.addElement(&alarmInf);
     page.addString("</div>");
     //page.addString("</div><div class=''>");
     page.addElement(&feederInf);
     page.addString("</div><h3>Tanque Superior</h3><div>");
-    page.addElement(&alarmSup);
     page.addElement(&spdSup);
     page.addString("<div class='card'>");
     page.addElement(&residuosSup);
@@ -138,6 +140,7 @@ void setup()
     page.addElement(&lucesSup);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
+    page.addElement(&alarmSup);
     page.addString("</div>");
     page.addElement(&feederSup);
     page.addString("</div>");
@@ -167,7 +170,7 @@ void setup()
 unsigned long lastCheck;
 unsigned long lastAlarmSup;
 unsigned long lastAlarmInf;
-
+int alarmInterval = 6000;
 int x=0;
 void loop()
 {
@@ -176,12 +179,13 @@ void loop()
     if (millis() - lastCheck > 5000)
     {
               if (alarmInf.value) {
-                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>600000 || lastAlarmInf==0)) {
+                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
                             alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
                             lastAlarmInf = millis(); }
               }
+              mdLed.update();
               if (alarmSup.value) {
-                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>600000 || lastAlarmSup==0)) {
+                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
                             alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
                             lastAlarmSup = millis();}
                 lastCheck = millis();

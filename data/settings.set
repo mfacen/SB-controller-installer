@@ -1,8 +1,8 @@
 name,flexibox
 uploadInterval,180
 secondsCapture,180
-wifi_ssid,M2000-D78E-plus
-wifi_pass,c093c0ae
+wifi_ssid,INFINITUM3284_2.4
+wifi_pass,espantasuegras
 serverName,michel.atarraya.ai
 mqttServer,192.168.10.115
 mqttTopic,noTopic

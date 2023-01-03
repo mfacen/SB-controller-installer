@@ -401,7 +401,7 @@ public:
     fileName = n;
   }
   void setFileNameData(String n) { fileName = n; }
-  void addSavedVariable(savedVariable *f)
+  void addSavedVariable(SavedVariable *f)
   {
     if (indexF < 9)
     {
@@ -808,7 +808,7 @@ public:
       String fileNameUpload = "defaultName.csv";
       loggableInterface *inputArray[30];
       // Output* outputArray[10];
-      savedVariable *variableArray[10];
+      SavedVariable *variableArray[10];
       float inputArrayLastSave[10];
       String names[10];
       int uploadInterval = 600;
@@ -1036,7 +1036,7 @@ public:
     // ########################################
     //  Command Keypad Control
     // ########################################
-    // class savedVariable;
+    // class SavedVariable;
     class KeypadControl : public Commands
     {
     public:
@@ -1047,7 +1047,7 @@ public:
         id = n;
         edit = new EditBox(name + "edt", "1234", "password", this);
         label = new Label(name + "lbl", "Locked", this);
-        state = new savedVariable("keyPadState"); // Why Im saving it ? I think cause it shuts off when no connection
+        state = new SavedVariable("keyPadState"); // Why Im saving it ? I think cause it shuts off when no connection
       }
       String getHtml()
       {
@@ -1090,7 +1090,7 @@ public:
       EditBox *edit;
       Label *label;
       String temp = "logStatus";
-      savedVariable *state;
+      SavedVariable *state;
     };
 
     // ########################################

@@ -509,7 +509,9 @@ class ModbusRelay: public HardwareOutput{
 class ModbusVFD: public HardwareOutput {
   public:
     ModbusVFD ( int _slaveID , int _type=0){ slaveID=_slaveID;type=_type;}
+    void setType(int t){type=t;}
     void update(float v){ value = v ;update();}
+
     void update(){
             #ifdef ESP32
 
@@ -559,7 +561,19 @@ class ModbusVFD: public HardwareOutput {
     float running=false;
     int type=0;
 };
-
+// class modbusVFD_html : public ElementsHtml {
+//   public:
+//     modbusVFD_html (String _id , ModbusVFD *m){vfd=m;id=_id;
+//       panel=new GenericOutputPanel (id,id,"",vfd,false,this,false);}
+//     void update(){vfd->update();value=vfd->value;}
+//     void update(float v){vfd->update(v);}
+//     String getHtml(){
+//       return panel->getHtml();
+//     }
+//   private:
+//     ModbusVFD * vfd;
+//     GenericOutputPanel *panel;
+// };
 // ########################################
 //  Modbus LED
 // ########################################

@@ -212,10 +212,12 @@ public:
     id = _id;
     type = _type;
     value = text.toFloat();
+
+   if (e!=0)
+    parent = e; // ERROR ERROR ERROR ERROR NO HACER ESTO /Serial.println (t);
+    //else
     pushElement(this); // Los elementos basicos se registran solos en el AllHTMLElemens !!
 
-    // if (e!=0)
-    parent = e; // ERROR ERROR ERROR ERROR NO HACER ESTO /Serial.println (t);
   }
 
   String getHtml()
@@ -335,10 +337,10 @@ public:
   {
     name = n;
     id = _id;
-    variable = new savedVariable(id);
+    variable = new SavedVariable(id);
     edit = new EditBox(id + "edt", "", _type, this);
     file = _file;
-    savedVariable::add(variable); // STATIC adds this variable to the list so it can init() correctly
+    SavedVariable::add(variable); // STATIC adds this variable to the list so it can init() correctly
     parent = _parent;
   }
   String getHtml()
@@ -409,7 +411,7 @@ public:
   }
 
 private:
-  savedVariable *variable;
+  SavedVariable *variable;
   EditBox *edit;
   String file;
 };
@@ -430,10 +432,14 @@ public:
     fields = _fields;
     fieldsCount = s;
     value = 0;
-    pushElement(this); // Los elementos basicos se registran solos en el AllHTMLElemens !!
+    savedVariable = new SavedVariable (id);
+    SavedVariable::add(savedVariable); // STATIC adds this variable to the list so it can init() correctly
 
     if (e != 0)
       parent = e; // ERROR ERROR ERROR ERROR NO HACER ESTO /Serial.println (t);
+    //else
+      pushElement(this); // Los elementos basicos se registran solos en el AllHTMLElemens !! 
+                        // AQUI LO HE CAMBIADO SOLO REGISTRA SI NO TIENE PARENT !
   }
 
   String getHtml()
@@ -458,6 +464,14 @@ public:
   }
   void update()
   {
+        if (firstRun)
+    {
+      //variable->update();
+      value = savedVariable->value;
+      //Serial.print("First Run Update Edit "+name+" = ");
+      //Serial.println(variable->value);
+      firstRun = false;
+    }
     if (value != lastValue)
     {
       text = fields[(int)value];
@@ -493,6 +507,7 @@ public:
 private:
   int fieldsCount;
   int lastValue = -1;
+  SavedVariable *savedVariable;
 };
 
 class I2C_Msg
@@ -895,7 +910,7 @@ public:
     chkState = new SavedEdit("on/off",id + "chkS", "/status.sta","checkbox", this);
     chkMode = new SavedEdit("Timer / Hours",id + "chkM", "/status.sta","checkbox", this);
     edt_Shedule->setStyle (" class='numInp'");
-    strTime = new savedVariable(id + "eTi");
+    strTime = new SavedVariable(id + "eTi");
     strTime->setFile("/status.sta");
     parent=e;
     label = new Label (id+"lbl","",this);
@@ -1032,7 +1047,7 @@ private:
   Label *label;
   String unit = "";
   HardwareOutput *output;
-  savedVariable *strTime;
+  SavedVariable *strTime;
   EditBox *edt_Shedule;
   SavedEdit *edt_OnTime;
   SavedEdit *edt_OffTime;
@@ -1061,7 +1076,7 @@ public:
     label = new Label(id + "lbl", "", this);
     label->setStyle(" class='numInp'"); //   Esto lo hago desde el CSS es una clase
     btnID = new ButtonPrompt((id + ("btnID")).c_str(), "Change ID", this);
-    columnName = new savedVariable (id+"Name");
+    columnName = new SavedVariable (id+"Name");
     // pushElement(this);          // Los elementos basicos se registran solos en el AllHTMLElemens !!
     if (use_calibration)
       cal = new calibration_module(id + "Cal", this);
@@ -1138,7 +1153,7 @@ private:
   Label *label;
   ButtonPrompt *btnID;
   String unit = "";
-  savedVariable *columnName;
+  SavedVariable *columnName;
   HardwareInput *input;
   calibration_module *cal;
   AverageModule *avg;
@@ -1165,7 +1180,7 @@ public:
     name = _name;
     unit = _unit;
     btnID = new ButtonPrompt((id + ("btnID")).c_str(), "Change ID", this);
-    columnName = new savedVariable (id+"Name");
+    columnName = new SavedVariable (id+"Name");
     label = new Label("lbl" + id,"text", this);
     label->setStyle(" class='numInp' "); //   Esto lo hago desde el CSS es una clase
     value=0;
@@ -1222,7 +1237,7 @@ private:
   Label *label;
   HardwareOutput *output;
     ButtonPrompt *btnID;
-  savedVariable *columnName;
+  SavedVariable *columnName;
   bool allow_name_change = false;
 };
 

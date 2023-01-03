@@ -145,6 +145,9 @@ input:checked+.toggle:before {
 	margin: .5em;
 	color: beige;
 	border-radius: .5em;
+	position: absolute;
+	top:0px;
+	right: 0px; 
 }
 body {
 	font-family: system-ui;
@@ -174,6 +177,8 @@ h4 {
 	border-radius: 10px;
 	display : flex;
 	flex-direction: column;
+	padding: .2em;
+
 }
 .divMain {
 	/* max-width: 40em; */
