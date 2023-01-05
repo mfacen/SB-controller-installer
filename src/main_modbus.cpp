@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.176"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.182"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -40,9 +40,9 @@ ModbusRelay relayLucesInf(1,16);
 ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
 ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
 //ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-ModbusLed mdLed (4);
-Modbus_Device anIn("AnalogIn",4);
-GenericInputPanel modbusIn ("ModbusIN","",&anIn);
+//ModbusLed mdLed (4);
+//Modbus_Device anIn("AnalogIn",4);
+//GenericInputPanel modbusIn ("ModbusIN","",&anIn);
 Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
 Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
@@ -180,13 +180,13 @@ void loop()
     {
               if (alarmInf.value) {
                         if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
-                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.getPressure()->value));
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.value));
                             lastAlarmInf = millis(); }
               }
-              mdLed.update();
+              //mdLed.update();
               if (alarmSup.value) {
                         if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
-                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.getPressure()->value));
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.value));
                             lastAlarmSup = millis();}
                 lastCheck = millis();
               }
