@@ -176,6 +176,9 @@ void loop()
 {
     generalLoop();
 
+    if (deviceID == "Indiana_3") lastAlarmSup = millis();
+
+
     if (millis() - lastCheck > 5000)
     {
               if (alarmInf.value) {

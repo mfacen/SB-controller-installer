@@ -372,7 +372,7 @@ public:
 // HE CREADO UN MODULO DE ALARMA MAS SIMPLE QUE SOLO SE CONECTA AL PI, LA DIRECCION ES LA MISMA QUE mqttServer.
 
 
-#ifdef ESP8266
+#ifdef ESP8266XXXXXXXX
 class TelegramAlarm
 {
 public:
@@ -397,7 +397,7 @@ private:
 };
 //HTTPClient *TelegramAlarm::httpClient;
 #endif
-#ifdef ESP32
+#if defined ( ESP32 ) || defined ( ESP8266)
 const char* root_ca= \
 
 "-----BEGIN CERTIFICATE-----\n"
