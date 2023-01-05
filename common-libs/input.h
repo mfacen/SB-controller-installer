@@ -643,11 +643,14 @@ public:
   {
     id = _id;
     child = e;
-    btnCalLow = new ButtonPrompt((child->id + ("btnLow")).c_str(), "Cal Low", this);
-    btnCalHigh = new ButtonPrompt(child->id + "btnHigh", "Cal High", this);
-    btnResetCal = new Button(child->id + "btnReset", "Reset Cal", this);
+    btnCalLow = new ButtonPrompt((child->id + ("btnLow")).c_str(), "Low", this);
+    btnCalHigh = new ButtonPrompt(child->id + "btnHigh", "High", this);
+    btnResetCal = new Button(child->id + "btnReset", "Reset", this);
   }
-  String getHtml() { return btnCalLow->getHtml() + btnCalHigh->getHtml()+btnResetCal->getHtml(); }
+  String getHtml() { 
+    return "<fieldset >Calibration<br>"+btnCalLow->getHtml() +"<br>"+
+     btnCalHigh->getHtml()+"<br>"+
+     btnResetCal->getHtml()+"</fieldset>"; }
 
   void init(float newData)
   {
@@ -917,11 +920,11 @@ public:
   }
   String getHtml()
   {
-    return "<div class='card'><h4>" + name + "</h4>"+
+    return "<div class='card'><h4>" + name + "</h4><fieldset class='card'>"+
     chkState->getHtml()+chkMode->getHtml()+"Time Schedule" +
              edt_Shedule->getHtml() + edt_OnTime->getHtml() + edt_OffTime->getHtml()+
              "<br>Status: "+label->getHtml() +
-             "</div>";
+             "</fieldset></div>";
 
   }
   void update()

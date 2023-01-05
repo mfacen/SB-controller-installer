@@ -21,12 +21,12 @@ public:
   String getHtml()
   {
     return "<div class=' card '><h4>" + 
-    name + "</h4>" + 
+    name + "</h4><fieldset>" + 
     onoffswitch->getHtml() +
      "<div class='card'>" + 
      bombaTimer->getHtml() + 
      valvulaPanel->getHtml() + 
-     "</div></div>";
+     "</div></fieldset></div>";
   }
   String postCallBack(ElementsHtml *e, String postValue)
   {
@@ -113,17 +113,17 @@ public:
 
   String getHtml()
   {
-    return "<div class=' card '><h4>" + name + "</h4><span>" +
-           weight->getHtml() + " gr</span><span>" +
-           interval->getHtml() + " h</span><span>" +
-           rate->getHtml() + " gr/s</span><span>" +
-           servings->getHtml() + " n</span><span>" +
-           airTime->getHtml() + " s</span>" +
-           btnStart->getHtml() +
-           btnReset->getHtml() +
+    return "<div class=' card '><h4>" + name + "</h4><fieldset>" +
+           weight->getHtml() + " gr<br>" +
+           interval->getHtml() + " h<br>" +
+           rate->getHtml() + " gr/s<br>" +
+           servings->getHtml() + " u<br>" +
+           airTime->getHtml() + " s<br>" +
+           btnStart->getHtml() +"<br>"+
+           btnReset->getHtml() +"<br>"+
            info->getHtml() +
            "<div class='row'>"+air->getHtml() +
-           feed->getHtml() + blower->getHtml() + "</div>"+
+           feed->getHtml() + blower->getHtml() + "</div></fieldset>"+
            "</div>";
   }
 
@@ -333,16 +333,16 @@ public:
   }
   String getHtml()
   {
-    String s = "<div class=' card '><h4>" + String(name) + "</h4>";
+    String s = "<div class=' card '><h4>" + String(name) + "</h4><fieldset>";
     s += pressure->getHtml();
     s += edtSetting->getHtml();
     s += speedCtrlPanel->getHtml();
-    s += cmbVFD_Type->getHtml();
+    s += "VFD Type: "+cmbVFD_Type->getHtml();
     //s += PID_GUI->getHtml();
     s += tmrVenturi->getHtml();
     //s += oxigen->getHtml();
     // s+=edtMinOxy->getHtml();
-    s += "</div>";
+    s += "</fieldset></div>";
     return s;
   }
   void update()
@@ -465,12 +465,12 @@ public:
   }
   String getHtml()
   {
-    String s = "<div class='card'><h4>" + name + "<h4>";
+    String s = "<div class='card'><h4>" + name + "<h4><fieldset>";
     s += set->getHtml();
     s += edtSet->getHtml();
     s+= panOut->getHtml();
     s += pid_module->getHtml();
-    s += "</div>";
+    s += "</fieldset></div>";
     return s;
   }
 
