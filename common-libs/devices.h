@@ -213,8 +213,8 @@ public:
 
     air->update();
     feed->update();
-    info->update("State:" + String(state->value) + " Feeds Left:" + String(feedNumber->value ) +
-                 "<br>Dispensed: " + String(dispensed->value) + " FeedTime: " + feedTime->text + "<br>" +
+    info->update("State:" + String(state->value) + " <br>Feeds Left:" + String(feedNumber->value ) +
+                 "<br>Dispensed: " + String(dispensed->value) + " <br>FeedTime: " + feedTime->text + "<br>" +
                  "Iddle Time: " + String(iddleTime->value) + "<br>");
   }
 

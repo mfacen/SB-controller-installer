@@ -14,7 +14,6 @@ TimeLabel lblTime("lblTime", "");
 LabelFreeHeap lblFreeHeap("lblHeap", "this");
 Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
 Label lblVersion("lblVersion", "Device: " + String(DEVICE_NAME) + " - Ver: " + String(SOFT_VERSION));
-DirCapture dirCapture("dCapt", "/capturas");
 //RS485Main serialCom(&page); // Esta es la #DEFINICION srlCtrlPin en todo el programa.
 //ModbusLed ledModbus ( 1 );
 //ModbusRelay (1,1);
@@ -145,7 +144,6 @@ void setup()
     page.addElement(&feederSup);
     page.addString("</div>");
     page.addElement(&logger);
-    page.addElement(&dirCapture);
     //page.addString("</div>");
     // page.addElement(&graphic);
     page.addString("<br>");

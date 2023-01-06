@@ -337,6 +337,8 @@ public:
     //btnDelete = new Button("de" + id, "Delete", this);
     btnUpload = new Button("up" + id, "Upload", this);
     // chart = new Chart ("ch"+id,this);
+    dirCapture = new DirCapture("dCapt", "/capturas");
+
   }
  String getHtml()
   {
@@ -363,6 +365,7 @@ public:
    // str += btnView->getHtml();
    // str += btnDelete->getHtml();
     str += btnUpload->getHtml();
+    str += dirCapture->getHtml();
     //         str += "<div><br>Inputs:";      Uncomment this to show inputs.
     //         if (index!=0) {
     //           str+="<ul>";
@@ -837,6 +840,7 @@ public:
       unsigned long lastUploadTry = 0;
       String sha1 = "BE:22:E9:99:11:41:F0:32:FC:DF:18:72:BC:8B:94:FA:86:24:25:B6";
       // Chart *chart;
+      DirCapture *dirCapture;
     };
     int Logger::partial = 0;
 

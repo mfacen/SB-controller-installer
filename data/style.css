@@ -280,12 +280,14 @@ input {
 	width: 5em;
 	background-color: var(--main-bg-color);
 	color: beige;
+	border-radius: 10px; 
 }
 
 select{
 	background-color: var(--main-bg-color);
 	color: beige;
 	margin: .5em;
+	border-radius: 10px; 
 }
 .numInp{
 	color: orangered;
