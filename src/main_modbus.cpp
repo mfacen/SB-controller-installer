@@ -13,7 +13,10 @@ TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
 LabelFreeHeap lblFreeHeap("lblHeap", "this");
 Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
-Label lblVersion("lblVersion", "Device: " + String(DEVICE_NAME) + " - Ver: " + String(SOFT_VERSION));
+Label lblVersion("lblVersion", "Device: " + String(DEVICE_NAME) +
+                   " - Ver: " + String(SOFT_VERSION)+
+                   " - ID = "+mdnsName);
+DirCapture dirCapture("dCapt", "/capturas");
 //RS485Main serialCom(&page); // Esta es la #DEFINICION srlCtrlPin en todo el programa.
 //ModbusLed ledModbus ( 1 );
 //ModbusRelay (1,1);
@@ -147,8 +150,9 @@ void setup()
     //page.addString("</div>");
     // page.addElement(&graphic);
     page.addString("<br>");
-    page.addElement(&lblFreeHeap);
     page.addElement(&lblVersion);
+    page.addString("<br>");
+    page.addElement(&lblFreeHeap);
     // page.addElement(&btnWifi);
 
     //page.setDebug(true); //

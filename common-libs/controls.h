@@ -15,6 +15,7 @@ void tcpCleanup()
   }
 }
 
+
 // HTM Decorators
 
 class Wrapper : public ElementsHtml
@@ -248,6 +249,8 @@ public:
 };
 String SavedVariable::file = "/status.sta";
 std::vector<SavedVariable *> SavedVariable::list;
+
+
 
 class PreferencesBinder
 {
