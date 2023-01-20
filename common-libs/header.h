@@ -101,7 +101,7 @@ esp32ModbusRTU modbus(&SerialInterface, 4);  // use Serial1 and pin 16 as RTS
 #endif
 enum VFD_Types { SOYAN_SVD , MOLLOM_B20 };
 enum GENERIC_TIMER_TYPES { TIMER , SCHEDULE };
-
+#define LOCAL_TIME_OFFSET 6
 String mqttServer = "192.168.1.115";
 #include "classes.h"
 #include "../common-libs/declarations.h"

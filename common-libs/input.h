@@ -291,6 +291,7 @@ public:
   {
     //Serial.println("EditBox->Update(String)" + id +","+t);
     text = t;
+    value=t.toFloat();
     update();
   }
   void deleteChar()
@@ -304,8 +305,6 @@ public:
     if ( (text != lastValue))
     {
       value = text.toFloat();
-      if (text == "false")
-        value = 0;
       if (text == "true")
         value = 1;
       lastValue = text;
@@ -411,11 +410,10 @@ public:
   }
 
 private:
-  SavedVariable *variable;
   EditBox *edit;
   String file;
+  SavedVariable *variable;
 };
-std::vector<SavedEdit *> SavedEdit::list;
 
 // ########################################
 //  Combo Box HTML
@@ -583,25 +581,18 @@ class Dsb18B20 : public HardwareInput
 {
 public:
   int pin;
-  DallasTemperature *tempSensors;
-  OneWire *oneWire;
-
-  Dsb18B20(int _pin)
-  {
-    pin = _pin;
-   // unit = "&#8451;"; // html code for ^C
-    // descriptor = "Dsb18B20";
-    pinMode(pin, INPUT_PULLUP);
+  static DallasTemperature *tempSensors;
+  static OneWire *oneWire;
+   static bool tempRequested;
+  static unsigned long lastTemperatureRequest;
+  static int intervalTemperature;
+static void initSensors(int pin){
     oneWire = new OneWire(pin);                   // Set up a OneWire instance to communicate with OneWire devices
     tempSensors = new DallasTemperature(oneWire); // Create an instance of the temperature sensor class
     tempSensors->setWaitForConversion(false);     //  dont block the program while the temperature sensor is reading
     tempSensors->begin();
-  }
-  //~Dsb18B20(ElementsHtml::deleteElement(this));
-
-
-  void update()
-  {
+}
+static float updateSensors( int device_number){
     if (!tempRequested)
     {
       tempSensors->requestTemperatures(); // Request the temperature from the sensor (it takes some time to read it)
@@ -612,27 +603,50 @@ public:
     if ((millis() - lastTemperatureRequest > intervalTemperature) && tempRequested)
     {
       //Serial.println(tempSensors->getDeviceCount());
-      value = tempSensors->getTempCByIndex(0) * factor; // Get the temperature from the sensor
       tempRequested = false;
+       return tempSensors->getTempCByIndex(device_number); // Get the temperature from the sensor
       
-      //Serial.println("temp"+String (value));
     }
-    // value = tempSensors->getTempCByIndex(0);
+
+}
+// static DeviceAddress* getAddress(int index){ 
+//   DeviceAddress *d;
+//   tempSensors->getAddress(d,index);
+//   return d;}
+  Dsb18B20(int _pin , int _device_number = 0)
+  {
+    pin = _pin;
+   // unit = "&#8451;"; // html code for ^C
+    // descriptor = "Dsb18B20";
+    pinMode(pin, INPUT_PULLUP);
+    device_number = _device_number;
+    Dsb18B20::initSensors(pin);
+  }
+  //~Dsb18B20(ElementsHtml::deleteElement(this));
+
+
+  void update()
+  {
+     value = Dsb18B20::updateSensors(device_number);
+     // Serial.println("Requesting device number"+String (value));
   }
   float getTempAndBlock()
   {
     tempSensors->setWaitForConversion(true); //  block the program while the temperature sensor is reading
     tempSensors->begin();
     tempSensors->requestTemperatures();
-    return value = tempSensors->getTempCByIndex(0);
+    return value = tempSensors->getTempCByIndex(device_number);
   }
-
+  void setDeviceNumber(int n){device_number = n;}
 private:
-  bool tempRequested = false;
-  unsigned long lastTemperatureRequest;
-  int intervalTemperature = 1500;
-};
 
+  int device_number = 0;
+};
+DallasTemperature *Dsb18B20::tempSensors;
+OneWire *Dsb18B20::oneWire;
+bool Dsb18B20::tempRequested;
+unsigned long Dsb18B20::lastTemperatureRequest;
+int Dsb18B20::intervalTemperature=5000;
 // ########################################
 //  CALIBRATION MODULE   ##################
 // ########################################
@@ -648,8 +662,8 @@ public:
     btnResetCal = new Button(child->id + "btnReset", "Reset", this);
   }
   String getHtml() { 
-    return "<fieldset >Calibration<br>"+btnCalLow->getHtml() +"<br>"+
-     btnCalHigh->getHtml()+"<br>"+
+    return "<fieldset >Calibration<br>"+btnCalHigh->getHtml() +"<br>"+
+     btnCalLow->getHtml()+"<br>"+
      btnResetCal->getHtml()+"</fieldset>"; }
 
   void init(float newData)
@@ -971,9 +985,12 @@ public:
             bool reversed=false;
            int onTime = String(edt_OnTime->getText().substring(0,2)+edt_OnTime->getText().substring(3,5)).toInt();
            int offTime = String(edt_OffTime->getText().substring(0,2)+edt_OffTime->getText().substring(3,5)).toInt();
-           int nowTime = String(String(hour())+(minute()<10?"0":"")+String(minute())).toInt();
+           time_t localTime = now()-LOCAL_TIME_OFFSET*3600;
+           //Serial.println (String(hour(localTime))+":"+String(minute(localTime)));
+           int nowTime = String(String(hour(localTime))+(minute(localTime)<10?"0":"")+String(minute(localTime))).toInt();
            reversed = (onTime > offTime); // in case onTime < offTime
-              //Serial.println(edt_OnTime->getText());
+              //Serial.println("TIMER ON:"+String(onTime)+"-"+offTime+"-"+nowTime);
+
           if (timeStatus() == timeSet) {
             if (( nowTime>onTime) &&  (nowTime<=offTime) )
                 {
@@ -1017,7 +1034,7 @@ public:
     {
       Serial.println(postValue);
       if (postValue=="1") {running = true; lastCheck = millis();    Serial.println("Running = TRUE");
-}
+      }
       else {stop();lastCheck=millis();}
     }
     if (e==chkMode){
@@ -1030,7 +1047,6 @@ public:
   {
     running = true;
     index=0;
-    Serial.println("Running = FALSE");
   }
   void stop()
   {
@@ -1069,8 +1085,11 @@ private:
 class GenericInputPanel : public Input
 {
 public:
-  GenericInputPanel(String n, String u, HardwareInput *h = NULL, bool use_calibration = false,
-                    bool use_Average = false, ElementsHtml *e = NULL,bool _allow_name_change=true)
+  GenericInputPanel(String n, String u, HardwareInput *h = NULL,
+                    bool use_calibration = false,
+                    bool use_Average = false,
+                     ElementsHtml *e = NULL,
+                     bool _allow_name_change=true)
   {
     id = n;
     unit = u;

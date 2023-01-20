@@ -193,7 +193,7 @@ public:
   void update()
   {
     String s ;//= docIdStr;
-    time_t localtime (now()-5*3600); //Aqui ajusto para la hora de Mexico
+    time_t localtime (now()-LOCAL_TIME_OFFSET*3600); //Aqui ajusto para la hora local
     //s += id;
     //s += F("').innerHTML='");
     s += String(day(localtime));

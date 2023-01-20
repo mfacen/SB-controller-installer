@@ -447,13 +447,15 @@ protected:
 // ########################################
 class Dsb18b20a : public HardwareInput{
   public:
-  Dsb18b20a ( int pin){
+  Dsb18b20a ( int pin , int _sensor_number = 0){
     pinMode(pin, INPUT_PULLUP);
     oneWire = new OneWire(pin);                   // Set up a OneWire instance to communicate with OneWire devices
     tempSensors = new DallasTemperature(oneWire); // Create an instance of the temperature sensor class
     tempSensors->setWaitForConversion(false);     //  dont block the program while the temperature sensor is reading
-    tempSensors->begin(); }
-     void update()
+    tempSensors->begin();
+    sensor_number = _sensor_number; 
+ }
+ void update()
   {
     if (!tempRequested)
     {
@@ -465,7 +467,7 @@ class Dsb18b20a : public HardwareInput{
     if ((millis() - lastTemperatureRequest > intervalTemperature) && tempRequested)
     {
       //Serial.println(tempSensors->getDeviceCount());
-      value = tempSensors->getTempCByIndex(0) * factor; // Get the temperature from the sensor
+      value = tempSensors->getTempCByIndex(sensor_number) * factor; // Get the temperature from the sensor
       tempRequested = false;
     //value = tempSensors->getTempCByIndex(0);
     }
@@ -485,6 +487,8 @@ protected:
     bool tempRequested = false;
   unsigned long lastTemperatureRequest;
   int intervalTemperature = 1500;
+    int sensor_number = 0;
+
 };
 
 

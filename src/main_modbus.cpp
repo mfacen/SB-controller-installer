@@ -111,6 +111,8 @@ void setup()
     //Serial.println(spdInf.pressure->id);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
+    logger.addInput(&lucesInf);
+    logger.addInput(&lucesSup);
     //logger.addInput(&clarificadorInf);
     //logger.addInput(&clarificadorSup);
     //Serial.println(spdInf.pressure->id);
