@@ -167,7 +167,7 @@ input {
 	width: 5em;
 	background-color: var(--main-bg-color);
 	color: beige;
-	border-radius: 10px; 
+	border-radius: 5px; 
 }
 
 select{

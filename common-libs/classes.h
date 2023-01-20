@@ -593,7 +593,24 @@ public:
         if (payload == "sendStatus")
         {
           File f=FILE_SYS.open("/status.sta","r");
-          client->begin(wifiClient,address+"/Update/"+deviceID+"/status.sta");
+          //client->begin(wifiClient,address+"/Update/"+deviceID+"/status.sta");
+          String a="http://"+address+"/Uploads/uploadFile.php";
+          if (wifiClient.connect(a.c_str(),80)){
+            Serial.println("Connected to server "+a);
+            wifiClient.println(F("POST http://example.com/upload.php HTTP/1.1"));
+            wifiClient.print(F("Host: "));
+            wifiClient.println("0.0.0.0");
+            wifiClient.println(F("Connection: close"));
+            wifiClient.println("Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryjg2qVIUS8teOAbN3");
+            wifiClient.println("Content-Disposition: form-data; name=\"mans\"; filename=\"filename\"" );
+            wifiClient.println("Content-Type: application/octet-stream");
+
+            wifiClient.print("Content-Length: ");
+            wifiClient.println(f.size());  
+            wifiClient.println();
+            wifiClient.write(f);
+          }
+          f.close();
         } // HERE I CAN DO STUFF TO RESET SETTINGS
           // OR EVEN ACTIONS TO PARTICULAR IC'S
           // if payload=="analogin3432ed" etc
