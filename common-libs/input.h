@@ -241,7 +241,12 @@ public:
       s += F("' id='");
       s += id;
       s += F("' value='");
-      s += text;
+      if (type=="time")
+          {s += text.substring(0,2)+":"+text.substring(3,5)+":00";
+          //Serial.println(text+"  -- "+text.substring(0,2)+":"+text.substring(3,5)+":00");
+          }
+      else
+          s += text;
       s += F("' onchange=\"btnClickText('");
       s += id;
       // if (type == "checkbox") {
@@ -307,7 +312,6 @@ public:
       value = text.toFloat();
       if (text == "true")
         value = 1;
-      lastValue = text;
       //Serial.println(value);
       
       if (type == "checkbox")
@@ -316,8 +320,10 @@ public:
       }
       else
       {
-        javaQueue.addJsonInner(id,"value="+text);
+        javaQueue.addJsonInner(id,"value="+text+((type=="time")?":00":""));
+        //if (type=="time")Serial.println("Type time in EditBox::update() "+text);
       }
+      lastValue = text;
     }
   }
 
@@ -346,7 +352,7 @@ public:
   {
     edit->setStyle(style );
     variable->update();
-    edit->update(variable->value);
+    edit->update(variable->text);
     String str;
     str +=name +" "+ edit->getHtml();
     return str;
@@ -373,13 +379,15 @@ public:
     if (firstRun)
     {
       //variable->update();
+      text = variable->text;
       value = variable->value;
       //Serial.print("First Run Update Edit "+name+" = ");
       //Serial.println(variable->value);
       firstRun = false;
     }
-    edit->update(variable->value);
+    edit->update(variable->text);
     value = variable->value;
+    text = variable->text;
       //Serial.println(id+":"+String(value));
 
   }
@@ -387,6 +395,7 @@ public:
   void update(String s)
   {
     variable->update(s);
+    text = s;
     value = variable->value;
   }
   void update(float f)
@@ -394,6 +403,7 @@ public:
     variable->update(String(f));
     edit->update(f);
     value = variable->value;
+    text=variable->text;
   }
 
   static std::vector<SavedEdit *> list; // esta lista estatica la he creado para hacerles init() a todas las
@@ -413,6 +423,7 @@ private:
   EditBox *edit;
   String file;
   SavedVariable *variable;
+  String text;
 };
 
 // ########################################
@@ -989,17 +1000,17 @@ public:
            //Serial.println (String(hour(localTime))+":"+String(minute(localTime)));
            int nowTime = String(String(hour(localTime))+(minute(localTime)<10?"0":"")+String(minute(localTime))).toInt();
            reversed = (onTime > offTime); // in case onTime < offTime
-              //Serial.println("TIMER ON:"+String(onTime)+"-"+offTime+"-"+nowTime);
+              //Serial.println("TIMER ON:"+String(onTime)+"-"+String(offTime)+"-"+String(nowTime));
 
           if (timeStatus() == timeSet) {
-            if (( nowTime>onTime) &&  (nowTime<=offTime) )
+            if (( nowTime>=onTime) &&  (nowTime<offTime) )
                 {
                 output->update(!reversed); value = !reversed;
                 //Serial.println("true");
               }
               else {
                 output->update(reversed); value = reversed;
-                   //           Serial.println("false");
+                     //Serial.println("false");
 
               }
           }

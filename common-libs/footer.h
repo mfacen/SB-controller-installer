@@ -659,7 +659,7 @@ void startServer()
 ///////////////////////////////////////////////////////
 void handleIndex()
 {
-    // server.send(400,"text/html",page.getHtmlString());
+    // server.send(200,"text/html","/index.html");
 }
 void handleWifiManager()
 {
@@ -944,8 +944,10 @@ void handleFileList()
                 Serial.println("handleFileRead: " + path);
                 if (path.endsWith("/"))
                     path += "index.html"; // If a folder is requested, send the index file
-                if (path == "/index.html")
+                if (path == "/index.html"){
                     page.getHtml();
+                    Serial.println("Index Updated");
+                }
                 String contentType = getContentType(path); // Get the MIME type
                 String pathWithGz = path + ".gz";
                 if (FILE_SYS.exists(pathWithGz) || FILE_SYS.exists(path))
