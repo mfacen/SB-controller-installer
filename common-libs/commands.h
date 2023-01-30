@@ -348,7 +348,7 @@ public:
     str += name;
     str += "'><h4>";
     str += name;
-    str += "</h4><br><div>";
+    str += "</h4><br><fieldset><div>";
     str += chkTimer->getHtml();
     str += " Interval: ";
     str += edtInterval->getHtml();
@@ -362,9 +362,9 @@ public:
     str += "</div><br><div>";
     str += btnSnap->getHtml();
     str += btnSave->getHtml();
-   // str += btnView->getHtml();
-   // str += btnDelete->getHtml();
+     // str += btnDelete->getHtml();
     str += btnUpload->getHtml();
+    str += "</fieldset>";
     str += dirCapture->getHtml();
     //         str += "<div><br>Inputs:";      Uncomment this to show inputs.
     //         if (index!=0) {

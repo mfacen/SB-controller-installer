@@ -242,7 +242,7 @@ public:
       s += id;
       s += F("' value='");
       if (type=="time")
-          {s += text.substring(0,2)+":"+text.substring(3,5)+":00";
+          {s += text.substring(0,2)+":"+text.substring(3,5);//+":00";
           //Serial.println(text+"  -- "+text.substring(0,2)+":"+text.substring(3,5)+":00");
           }
       else

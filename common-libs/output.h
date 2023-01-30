@@ -481,6 +481,7 @@ class ModbusRelay: public HardwareOutput{
    ModbusRelay(int _slaveID, int _relayNumber) { 
      gSlaveID = _slaveID;
      relayNumber = _relayNumber;
+     list.push_back(this);
    }
     void update(){
       #ifdef ESP32
@@ -488,7 +489,7 @@ class ModbusRelay: public HardwareOutput{
       //unsigned long tmr = millis();
       //Serial.println("Writing to Modbus Relay "+String(relayNumber));
       //nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
-                  modbus.writeSingleHoldingRegister(gSlaveID,relayNumber,(value?0x0100:0x0200));
+          modbus.writeSingleHoldingRegister(gSlaveID,relayNumber,(value?0x0100:0x0200));
 
       //Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
@@ -496,11 +497,24 @@ class ModbusRelay: public HardwareOutput{
       #endif
     }
     void update (float v){value=v;update();}
+
+    static void checkData(uint8_t* data){
+          for (unsigned int i = 0; i < list.size(); i++){
+             if ( data[list[i]->relayNumber] == list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
+                list[i]->lastValue=-1;list[1]->update();
+                Serial.println("Discrepancia en  Relay numero "+String(list[i]->relayNumber));
+             };
+
+          }
+
+    }
   private:
     float lastValue = -1;
     int relayNumber;
     int gSlaveID;
+    static std::vector <ModbusRelay*> list;
 };
+std::vector<ModbusRelay *> ModbusRelay::list;
 
 // ########################################
 //  Modbus VFD

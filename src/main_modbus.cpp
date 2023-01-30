@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.184"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.185"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
