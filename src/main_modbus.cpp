@@ -93,15 +93,15 @@ void setup()
     //Serial2.begin(115200, SERIAL_8N1, 16, 17);
     SerialInterface.begin(9600, SERIAL_8N1, 16, 17);
     //nodeRelays.begin(SerialInterface);
-    modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
-    Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
-    for (size_t i = 0; i < length; ++i) {
-      Serial.printf("%02x", data[i]);
-    }
-    std::reverse(data, data + 4);  // fix endianness
-    Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
-    Serial.print("\n\n");
-  });
+    // modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
+    // Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
+    // for (size_t i = 0; i < length; ++i) {
+    //   Serial.printf("%02x", data[i]);
+    // }
+    // std::reverse(data, data + 4);  // fix endianness
+    // Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
+    // Serial.print("\n\n");
+  //});
     SavedVariable::init();
     spdInf.setVfd(&spdInfCtrl);
     spdSup.setVfd(&spdSupCtrl);
@@ -183,7 +183,7 @@ void loop()
     if (deviceID == "Indiana_3") lastAlarmSup = millis();
 
 
-    if (millis() - lastCheck > 5000)
+    if (millis() - lastCheck > 10000)
     {
               if (alarmInf.value) {
                         if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
@@ -195,7 +195,8 @@ void loop()
                         if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
                             alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.value));
                             lastAlarmSup = millis();}
-                lastCheck = millis();
               }
+              lastCheck = millis();
+              ModbusRelay::requestData(1);
     }
 }

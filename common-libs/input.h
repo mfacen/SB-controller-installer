@@ -1067,7 +1067,8 @@ public:
     index=0;
   }
   void update(float f)
-  {
+  { 
+    output->lastValue=-1;
     output->update(f);
     value = f;
   }
