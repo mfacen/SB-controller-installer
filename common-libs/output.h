@@ -11,6 +11,7 @@ class HardwareOutput
 public:
   float factor = 1;
   float value;
+  float lastValue;
   //String id;
   virtual void update();
   virtual void update(float f);
@@ -497,10 +498,14 @@ class ModbusRelay: public HardwareOutput{
       #endif
     }
     void update (float v){value=v;update();}
-
+    static void requestData(int _slaveID){
+      modbus.readHoldingRegisters(_slaveID,0,16);
+      Serial.println("Sending Relay Data Request");
+    }
     static void checkData(uint8_t* data){
+      Serial.println("Checking for Modbus Relay discrepancies");
           for (unsigned int i = 0; i < list.size(); i++){
-             if ( data[list[i]->relayNumber] == list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
+             if ( data[31-(list[i]->relayNumber-1) * 2  ] != list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
                 list[i]->lastValue=-1;list[1]->update();
                 Serial.println("Discrepancia en  Relay numero "+String(list[i]->relayNumber));
              };
@@ -509,7 +514,6 @@ class ModbusRelay: public HardwareOutput{
 
     }
   private:
-    float lastValue = -1;
     int relayNumber;
     int gSlaveID;
     static std::vector <ModbusRelay*> list;
