@@ -505,7 +505,7 @@ class ModbusRelay: public HardwareOutput{
     static void checkData(uint8_t* data){
       Serial.println("Checking for Modbus Relay discrepancies");
           for (unsigned int i = 0; i < list.size(); i++){
-             if ( data[31-(list[i]->relayNumber-1) * 2  ] != list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
+             if ( data[(list[i]->relayNumber-1) * 2 +1  ] != list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
                 list[i]->lastValue=-1;list[i]->update();
                 Serial.println("Discrepancia en  Relay numero "+String(list[i]->relayNumber));
              };
