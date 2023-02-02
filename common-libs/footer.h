@@ -159,26 +159,14 @@ void startUpWifi()
   SerialInterface.begin(9600);
   modbus.onData( []  // lambda
             (uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
-    Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
-    for (size_t i = 0; i < length; ++i) {
-      Serial.printf("%02x", data[i]);
-      Serial.printf(" ");
-    }
-    //std::reverse(data, data + 4);  // fix endianness
-    // for (size_t i = 0; i < length; ++i) { // print again
-    //   Serial.printf("%02x", data[i]);
-    //   Serial.printf(" ");
-    // }
+    // Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
+    // for (size_t i = 0; i < length; ++i) {
+    //   Serial.printf("N: %02x : %02x   :",i, data[i]);
+    //   if (i%2) Serial.printf("\n");
+    // Serial.printf("\nval received on Modbus: %.2f", *reinterpret_cast<float*>(data));
+    // Serial.print("\n\n");
 
-    Serial.printf("\nval received on Modbus: %.2f", *reinterpret_cast<float*>(data));
-    Serial.print("\n\n");
-
-    //Modbus_Device::checkSlaveIDs (serverAddress,data[0]); // es Static
-        //Serial.println("FC+"+String(fc));
     if ( fc == esp32Modbus::READ_HOLD_REGISTER ) {
-        //for ( int i =0; i< data->size(); i++){
-            //  Serial.println("FC=3 !!!!!!!!!!!!: " );
-        //}
         ModbusRelay::checkData(data);
     }
   });
