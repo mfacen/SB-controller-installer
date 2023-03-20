@@ -337,8 +337,6 @@ public:
     //btnDelete = new Button("de" + id, "Delete", this);
     btnUpload = new Button("up" + id, "Upload", this);
     // chart = new Chart ("ch"+id,this);
-    dirCapture = new DirCapture("dCapt", "/capturas");
-
   }
  String getHtml()
   {
@@ -348,7 +346,7 @@ public:
     str += name;
     str += "'><h4>";
     str += name;
-    str += "</h4><br><fieldset><div>";
+    str += "</h4><br><div>";
     str += chkTimer->getHtml();
     str += " Interval: ";
     str += edtInterval->getHtml();
@@ -362,10 +360,9 @@ public:
     str += "</div><br><div>";
     str += btnSnap->getHtml();
     str += btnSave->getHtml();
-     // str += btnDelete->getHtml();
+   // str += btnView->getHtml();
+   // str += btnDelete->getHtml();
     str += btnUpload->getHtml();
-    str += "</fieldset>";
-    str += dirCapture->getHtml();
     //         str += "<div><br>Inputs:";      Uncomment this to show inputs.
     //         if (index!=0) {
     //           str+="<ul>";
@@ -840,7 +837,6 @@ public:
       unsigned long lastUploadTry = 0;
       String sha1 = "BE:22:E9:99:11:41:F0:32:FC:DF:18:72:BC:8B:94:FA:86:24:25:B6";
       // Chart *chart;
-      DirCapture *dirCapture;
     };
     int Logger::partial = 0;
 
@@ -888,7 +884,7 @@ public:
       Input *inputEdit;
       ComboBox *op;
       String signs[3] = {"=", ">", "<"};
-
+      bool firstRun = true;
       ActiveControl(String n, Input *inL, String _op, Input *inR, HardwareOutput *out, Input *inpEdit)
           : inputLeft{inL}, inputRight{inR}, output{out}, inputEdit{inpEdit}
       {
@@ -897,6 +893,8 @@ public:
         id = name;
         output = out;
         inputEdit->parent = this;
+        inputRight->parent = this;
+        op->parent = this;
       };
 
       String getHtml()
@@ -921,10 +919,17 @@ public:
       }
       void update()
       {
+        if (firstRun) {
+          firstRun= false;
+          //preferences.getFloat(inputLeft->name.c_str());
+          inputRight->update(preferences.getFloat(inputRight->id.c_str()));
+          inputEdit->update(preferences.getFloat(inputEdit->id.c_str()));
+          op->update(preferences.getFloat(op->id.c_str()));
+        }
         inputEdit->update();
         inputLeft->update();
         inputRight->update();
-
+        //Serial.println(String(inputRight->value)+" "+String(inputEdit->value));
         if (op->text == ">")
         {
           if (inputLeft->value > inputRight->value)
@@ -952,13 +957,19 @@ public:
           else
             output->update(!inputEdit->value);
         }
+        value = output->value;
       }
       bool run()
       {
         update();
         return true;
       }
-      String postCallBack(ElementsHtml *e, String postValue) { return ""; }
+      String postCallBack(ElementsHtml *e, String postValue) { 
+        if (e==inputEdit) preferences.putFloat(inputEdit->id.c_str(),inputEdit->value);
+        if (e==inputRight) preferences.putFloat(inputRight->id.c_str(),inputRight->value);
+        if (e==op) preferences.putFloat(op->id.c_str(),op->value);
+        //Serial.println(e->id);
+        return ""; }
     };
 
     class ActivePause : public ActiveControl
@@ -982,6 +993,13 @@ public:
         if (op->text = ">")
         {
           if (inputLeft->value > inputRight->value)
+          {
+            value = 1;
+          }
+        }
+        if (op->text = "<")
+        {
+          if (inputLeft->value < inputRight->value)
           {
             value = 1;
           }

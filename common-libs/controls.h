@@ -1,6 +1,6 @@
 #ifdef ESP8266
-//#include "~/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src/LittleFS.h"
-//#include <LittleFS>
+// #include "~/.platformio/packages/framework-arduinoespressif8266/libraries/LittleFS/src/LittleFS.h"
+// #include <LittleFS>
 #endif
 
 struct tcp_pcb;
@@ -14,7 +14,6 @@ void tcpCleanup()
     tcp_abort(tcp_tw_pcbs);
   }
 }
-
 
 // HTM Decorators
 
@@ -45,7 +44,7 @@ public:
     id = e->getId();
     parent = e;
     text = t;
-    //pushElement(this); // Los elementos basicos se registran solos en el AllHTMLElemens !!
+    // pushElement(this); // Los elementos basicos se registran solos en el AllHTMLElemens !!
   }
   void getPrompt()
   {
@@ -64,8 +63,8 @@ public:
     else
       return "";
   }
-  //String s="handlePrompt('";s+=e->getId();s+="','";
-  //  s+=text;s+="');"; return s;}
+  // String s="handlePrompt('";s+=e->getId();s+="','";
+  //   s+=text;s+="');"; return s;}
 private:
   String text;
 };
@@ -85,101 +84,100 @@ public:
   {
 
     // Tengo que crear un archivo temporal hasta que funcione el truncate del ESP32. !!!!!
-    File mapFile; File tempFlie;
-    #ifdef ESP8266
+    File mapFile;
+    File tempFlie;
+#ifdef ESP8266
     LittleFS.exists(file.c_str()) ? mapFile = LittleFS.open(file, "r+") : mapFile = LittleFS.open(file, "w+");
-    #endif
-    #ifdef ESP32
-    FILE_SYS.exists(file.c_str()) ? 
-      mapFile = FILE_SYS.open(file, "r+") : 
-      mapFile = FILE_SYS.open(file, "w+");
-    #endif
-    //Serial.println(file + String(mapFile));
+#endif
+#ifdef ESP32
+    FILE_SYS.exists(file.c_str()) ? mapFile = FILE_SYS.open(file, "r+") : mapFile = FILE_SYS.open(file, "w+");
+#endif
+    // Serial.println(file + String(mapFile));
     String outputString;
-    //StaticJsonDocument<200> doc;
-    //deserializeJson (doc,mapFile);
+    // StaticJsonDocument<200> doc;
+    // deserializeJson (doc,mapFile);
     if (mapFile)
     {
       boolean processed = false;
-      //Serial.println("saveMap-- found file "+String(mapFile.name()));
+      // Serial.println("saveMap-- found file "+String(mapFile.name()));
       while (mapFile.available())
       {
         String line = mapFile.readStringUntil('\n');
-        if (!line || line==String('\n') || line=="") break;
+        if (!line || line == String('\n') || line == "")
+          break;
         String parameter = line.substring(0, line.indexOf(","));
         String value = line.substring(line.indexOf(",") + 1, line.length());
         if (value == "")
           value = " ";
-         //Serial.print(parameter);Serial.println(value);
+        // Serial.print(parameter);Serial.println(value);
         if ((parameter != "" && parameter != ",") && (parameter == receivedParameter))
         {
           // mapFile.seek( - (line.length() ,SeekCur);
 
           outputString += receivedParameter + "," + receivedValue + "\n";
-          //Serial.println(outputString);
+          // Serial.println(outputString);
           processed = true;
         }
         else
         {
-          if (parameter != "" && parameter!=" " && parameter!="," && parameter.length()>1)
+          if (parameter != "" && parameter != " " && parameter != "," && parameter.length() > 1)
           {
             outputString += parameter + "," + value + "\n";
           }
         }
-        
       }
       if (!processed)
       {
-        //Serial.println("Output String: " + String(outputString.length()));
+        // Serial.println("Output String: " + String(outputString.length()));
         if (receivedParameter != "")
           outputString += receivedParameter + "," + receivedValue + "\n";
       }
     }
     mapFile.seek(0, SeekSet);
-    //mapFile.close();
-    //SPIFFS.remove(file.c_str());
+    // mapFile.close();
+    // SPIFFS.remove(file.c_str());
     mapFile = FILE_SYS.open(file, "r+");
-    //if (debug) Serial.println("new Settings: \n"+settings);
-    outputString+="\n";
+    // if (debug) Serial.println("new Settings: \n"+settings);
+    outputString += "\n";
     mapFile.write((uint8_t *)outputString.c_str(), outputString.length());
-    #ifdef ESP8266
+#ifdef ESP8266
     mapFile.truncate(outputString.length()); //  ESTO ES NUEVO PARA NO DEJAR COLAS EN EL ARCHIVO
-    #endif
-    #ifdef ESP32
-    //mapFile.truncate(outputString.length()); //  Para hacer truncate debo updatear pero hay problemas de dependencias
-    // truncate viene en la version 4.00
-    //mapFile.seek(outputString.length()+1);
-    //mapFile.write(EOF);
-    #endif
+#endif
+#ifdef ESP32
+// mapFile.truncate(outputString.length()); //  Para hacer truncate debo updatear pero hay problemas de dependencias
+//  truncate viene en la version 4.00
+// mapFile.seek(outputString.length()+1);
+// mapFile.write(EOF);
+#endif
     mapFile.close();
   }
 
   static String lookUpMap(String receivedParameter, String fileName)
   {
     File mapFile;
-     #ifdef ESP8266
+#ifdef ESP8266
     mapFile = LittleFS.open(fileName, "r+");
-    #endif
-    #ifdef ESP32
+#endif
+#ifdef ESP32
     mapFile = FILE_SYS.open(fileName, "r+");
-    #endif
+#endif
     String reply = "";
-      //Serial.println("Starting LookUp " + receivedParameter);
+    // Serial.println("Starting LookUp " + receivedParameter);
     if (mapFile)
     {
 
       while (mapFile.available())
       {
         String line = mapFile.readStringUntil('\n');
-        //Serial.println("Read Line: " + line+ "looking for: " + receivedParameter);
+        // Serial.println("Read Line: " + line+ "looking for: " + receivedParameter);
         String parameter = line.substring(0, line.indexOf(","));
         String value = line.substring(line.indexOf(",") + 1, line.length());
-        //Serial.println ("Sub LookUpMap, file: "+fileName+ " found: " + String(parameter) + ":" + String(value));
+        // Serial.println ("Sub LookUpMap, file: "+fileName+ " found: " + String(parameter) + ":" + String(value));
 
         if (parameter == receivedParameter)
         {
           reply = value;
-          //Serial.println ("Sub LookUpMap. found parameter: " + String(parameter) + ":" + String(value));
+          // Serial.println ("Sub LookUpMap. found parameter: " + String(parameter) + ":" + String(value));
         }
       }
     }
@@ -190,7 +188,7 @@ public:
   static void saveLog(String text)
   {
     File logFile = FILE_SYS.open("/log.txt", "a+");
-    //logFile.write((uint8_t *)text.c_str(), text.length());
+    // logFile.write((uint8_t *)text.c_str(), text.length());
     logFile.println(text);
     logFile.close();
     Serial.println("Logged:");
@@ -198,59 +196,78 @@ public:
   }
 };
 
-class SavedVariable 
+class SavedVariable
 {
 public:
-  SavedVariable(String _name) { name = _name;add(this); text=_name;}
-
-  static std::vector<SavedVariable *> list; // esta lista estatica la he creado para hacerles init() a todas las 
-  static void init(){ for (auto *s :list) {s->update();}} //  variables que he creado.
-  static void add(SavedVariable *var){
-    list.push_back(var);
+  SavedVariable(String _name)
+  {
+    name = _name;
+    //add(this);
+    text = _name;
   }
-  void setFile(String _file) { file = _file; }
+  // //static std::vector<SavedVariable *> list; // esta lista estatica la he creado para hacerles init() a todas las
+  // static void init()
+  // {
+  //   for (auto *s : list)
+  //   {
+  //     s->update();
+  //   }
+  // } //  variables que he creado.
+  // static void add(SavedVariable *var)
+  // {
+  //   list.push_back(var);
+  // }
+   void setFile(String _file) {  }
 
   void update(float v)
   {
     value = v;
     text = String(v);
-    MapFile::saveMap(name, String(value), file);
+    //MapFile::saveMap(name, String(value), file);
+    update(text);
   }
 
   void update()
   {
-    text = MapFile::lookUpMap(name, file);
-    if (text == "")
-    {
-      MapFile::saveMap(name, "", file);
-    }
-    //Serial.println("Trying to save in "+name+text+file);}
-    //else
-      //Serial.println("Found " + name + "<->" + text);
+    // text = MapFile::lookUpMap(name, file);
+    // if (text == "")
+    // {
+    //   MapFile::saveMap(name, "", file);
+    // }
+    // // Serial.println("Trying to save in "+name+text+file);}
+    // // else
+    // // Serial.println("Found " + name + "<->" + text);
+    // value = text.toFloat();
+    char nw[name.length() + 1];
+    name.toCharArray(nw, sizeof(name));
+    text = preferences.getString(nw, "");
+    Serial.println("Found " + name + "<->" + text);
     value = text.toFloat();
   }
   void update(String newText)
   {
     text = newText;
     value = text.toFloat();
-    //Serial.println("Updating " + name + " to " + text);
-    MapFile::saveMap(name, text, file);
+    // Serial.println("Updating " + name + " to " + text);
+    // MapFile::saveMap(name, text, file);
+    // const char *nw = name.c_str();
+    char nw[name.length() + 1];
+    name.toCharArray(nw, sizeof(name));
+    preferences.putString(nw, text);
   }
   String toString()
   {
     return name + " : " + text;
   }
-  
-  //private:
+
+  // private:
   String name;
-  static String file;
+  //static String file;
   float value = 0;
   String text;
 };
-String SavedVariable::file = "/status.sta";
-std::vector<SavedVariable *> SavedVariable::list;
-
-
+//String SavedVariable::file = "/status.sta";
+//std::vector<SavedVariable *> SavedVariable::list;
 
 class PreferencesBinder
 {
@@ -362,35 +379,33 @@ public:
     }
 
     // report result
-    //Serial.print(sat);
-    //sat      = round(sat*100)/100;
+    // Serial.print(sat);
+    // sat      = round(sat*100)/100;
     return sat;
   }
 };
-
 
 // POR AHORA LE HE SACADO EL TELEGRAM ALARM PORQUE EL CLIENTE SEGURO OCUPABA MUCHO ESPACIO EN EL ESP32
 // ESTABA FUNCIONANDO PERO YA NO PODIA HACER UPDATES PORQUE OCUPABA MAS DEL 50% DE MEMORIA
 // PERO SI FUNCIONA BIEN LA CONECCION HTTPS PERO AHORA LA ALARMA LA ENVIA EL RASPBERRY PI
 // HE CREADO UN MODULO DE ALARMA MAS SIMPLE QUE SOLO SE CONECTA AL PI, LA DIRECCION ES LA MISMA QUE mqttServer.
 
-
-#ifdef ESP8266XXXXXXXX
+#ifdef ESP8266
 class TelegramAlarm
 {
 public:
-  TelegramAlarm() {  }
-   void alarm(String a)
+  TelegramAlarm() {}
+  void alarm(String a)
   {
-    //httpClient = new HTTPClient();
+    // httpClient = new HTTPClient();
     httpClient.addHeader("Content-Type", "text/plain");
 
-    String address = ("http://"+mqttServer+"/Update/alarm.php?msg='" + a + "'");
+    String address = ("http://" + mqttServer + "/Update/alarm.php?msg='" + a + "'");
     if (a != "")
     {
-      httpClient.begin(wifiClient,address);
-      int err = httpClient.GET(); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
-      Serial.println("Trying to reach messenger Address: "+address+" error: "+httpClient.errorToString(err));
+      httpClient.begin(wifiClient, address);
+      int err = httpClient.GET(); // POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
+      Serial.println("Trying to reach messenger Address: " + address + " error: " + httpClient.errorToString(err));
     }
   }
 
@@ -398,35 +413,35 @@ private:
   HTTPClient httpClient;
   WiFiClient wifiClient;
 };
-//HTTPClient *TelegramAlarm::httpClient;
+// HTTPClient *TelegramAlarm::httpClient;
 #endif
-#if defined ( ESP32 ) || defined ( ESP8266)
-const char* root_ca= \
+#if defined(ESP32)
+const char *root_ca =
 
-"-----BEGIN CERTIFICATE-----\n"
-"MIIDxTCCAq2gAwIBAgIBADANBgkqhkiG9w0BAQsFADCBgzELMAkGA1UEBhMCVVMx\n"
-"EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoT\n"
-"EUdvRGFkZHkuY29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRp\n"
-"ZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAwMFoXDTM3MTIzMTIz\n"
-"NTk1OVowgYMxCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQH\n"
-"EwpTY290dHNkYWxlMRowGAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjExMC8GA1UE\n"
-"AxMoR28gRGFkZHkgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgLSBHMjCCASIw\n"
-"DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL9xYgjx+lk09xvJGKP3gElY6SKD\n"
-"E6bFIEMBO4Tx5oVJnyfq9oQbTqC023CYxzIBsQU+B07u9PpPL1kwIuerGVZr4oAH\n"
-"/PMWdYA5UXvl+TW2dE6pjYIT5LY/qQOD+qK+ihVqf94Lw7YZFAXK6sOoBJQ7Rnwy\n"
-"DfMAZiLIjWltNowRGLfTshxgtDj6AozO091GB94KPutdfMh8+7ArU6SSYmlRJQVh\n"
-"GkSBjCypQ5Yj36w6gZoOKcUcqeldHraenjAKOc7xiID7S13MMuyFYkMlNAJWJwGR\n"
-"tDtwKj9useiciAF9n9T521NtYJ2/LOdYq7hfRvzOxBsDPAnrSTFcaUaz4EcCAwEA\n"
-"AaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYE\n"
-"FDqahQcQZyi27/a9BUFuIMGU2g/eMA0GCSqGSIb3DQEBCwUAA4IBAQCZ21151fmX\n"
-"WWcDYfF+OwYxdS2hII5PZYe096acvNjpL9DbWu7PdIxztDhC2gV7+AJ1uP2lsdeu\n"
-"9tfeE8tTEH6KRtGX+rcuKxGrkLAngPnon1rpN5+r5N9ss4UXnT3ZJE95kTXWXwTr\n"
-"gIOrmgIttRD02JDHBHNA7XIloKmf7J6raBKZV8aPEjoJpL1E/QYVN8Gb5DKj7Tjo\n"
-"2GTzLH4U/ALqn83/B2gX2yKQOC16jdFU8WnjXzPKej17CuPKf1855eJ1usV2GDPO\n"
-"LPAvTK33sefOT6jEm0pUBsV/fdUID+Ic/n4XuKxe9tQWskMJDE32p2u0mYRlynqI\n"
-"4uJEvlz36hz1\n"
-"-----END CERTIFICATE-----\n";
- #include <UniversalTelegramBot.h>
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDxTCCAq2gAwIBAgIBADANBgkqhkiG9w0BAQsFADCBgzELMAkGA1UEBhMCVVMx\n"
+    "EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxGjAYBgNVBAoT\n"
+    "EUdvRGFkZHkuY29tLCBJbmMuMTEwLwYDVQQDEyhHbyBEYWRkeSBSb290IENlcnRp\n"
+    "ZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5MDkwMTAwMDAwMFoXDTM3MTIzMTIz\n"
+    "NTk1OVowgYMxCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQH\n"
+    "EwpTY290dHNkYWxlMRowGAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjExMC8GA1UE\n"
+    "AxMoR28gRGFkZHkgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgLSBHMjCCASIw\n"
+    "DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL9xYgjx+lk09xvJGKP3gElY6SKD\n"
+    "E6bFIEMBO4Tx5oVJnyfq9oQbTqC023CYxzIBsQU+B07u9PpPL1kwIuerGVZr4oAH\n"
+    "/PMWdYA5UXvl+TW2dE6pjYIT5LY/qQOD+qK+ihVqf94Lw7YZFAXK6sOoBJQ7Rnwy\n"
+    "DfMAZiLIjWltNowRGLfTshxgtDj6AozO091GB94KPutdfMh8+7ArU6SSYmlRJQVh\n"
+    "GkSBjCypQ5Yj36w6gZoOKcUcqeldHraenjAKOc7xiID7S13MMuyFYkMlNAJWJwGR\n"
+    "tDtwKj9useiciAF9n9T521NtYJ2/LOdYq7hfRvzOxBsDPAnrSTFcaUaz4EcCAwEA\n"
+    "AaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYE\n"
+    "FDqahQcQZyi27/a9BUFuIMGU2g/eMA0GCSqGSIb3DQEBCwUAA4IBAQCZ21151fmX\n"
+    "WWcDYfF+OwYxdS2hII5PZYe096acvNjpL9DbWu7PdIxztDhC2gV7+AJ1uP2lsdeu\n"
+    "9tfeE8tTEH6KRtGX+rcuKxGrkLAngPnon1rpN5+r5N9ss4UXnT3ZJE95kTXWXwTr\n"
+    "gIOrmgIttRD02JDHBHNA7XIloKmf7J6raBKZV8aPEjoJpL1E/QYVN8Gb5DKj7Tjo\n"
+    "2GTzLH4U/ALqn83/B2gX2yKQOC16jdFU8WnjXzPKej17CuPKf1855eJ1usV2GDPO\n"
+    "LPAvTK33sefOT6jEm0pUBsV/fdUID+Ic/n4XuKxe9tQWskMJDE32p2u0mYRlynqI\n"
+    "4uJEvlz36hz1\n"
+    "-----END CERTIFICATE-----\n";
+#include <UniversalTelegramBot.h>
 #include <WiFiClientSecure.h>
 class TelegramAlarm
 {
@@ -435,31 +450,35 @@ public:
   {
     httpClient = new HTTPClient();
     WiFiClientSecure wifiSecure;
-      wifiSecure.setCACert(root_ca);
-    //httpClient->addHeader("Content-Type", "application/x-www-form-urlencoded");
+#ifdef ESP32
+    wifiSecure.setCACert(root_ca);
+#endif
+    // #ifdef ESP8266                       Trate de hacer esto en esp8266 pero resetea
+    //   BearSSL::X509List x509(root_ca);
+    //   wifiSecure.setTrustAnchors(&x509);
+    // #endif
+    // httpClient->addHeader("Content-Type", "application/x-www-form-urlencoded");
     httpClient->addHeader("Content-Type", "app/json");
     String address = ("https://api.telegram.org/bot1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM/sendMessage");
     if (a != "")
     {
-      //int err=httpClient->begin(address,root_ca);
-        UniversalTelegramBot bot("1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM", wifiSecure);
+      // int err=httpClient->begin(address,root_ca);
+      UniversalTelegramBot bot("1950585553:AAFCxpKbaHP8yk0A-HJR0eYwJkHAh60t8dM", wifiSecure);
 
-     // Serial.println("HttpClient begun, result: "+String(err));
-      bot.sendMessage("-891650240",a);
-      //err = httpClient->POST("{'chat_id':1461925075,'text':'"+a+"'}"); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
-      //Serial.println("Trying to reach telegram, result: "+String(err));
+      // Serial.println("HttpClient begun, result: "+String(err));
+      bot.sendMessage("-891650240", a);
+      // err = httpClient->POST("{'chat_id':1461925075,'text':'"+a+"'}"); //POST((wifiClient,"192.168.1.115/Update/alarm.php?msg='"+a+"'").c_str());//("192.168.1.115/Update/alarm.php?msg="+a).c_str());
+      // Serial.println("Trying to reach telegram, result: "+String(err));
     }
   }
 
 private:
   static HTTPClient *httpClient;
-  //static WiFiClient *wifiClient;
+  // static WiFiClient *wifiClient;
 };
 HTTPClient *TelegramAlarm::httpClient;
-//WiFiClient *TelegramAlarm::wifiClient;
+// WiFiClient *TelegramAlarm::wifiClient;
 #endif
-
-
 
 // class RelayTest : public ElementsHtml {
 //   public:
@@ -472,7 +491,7 @@ HTTPClient *TelegramAlarm::httpClient;
 //     }
 //     String postCallBack(ElementsHtml *e, String postValue){
 //       if (e==relayNumber) { pinMode ( e->value , OUTPUT ); }
-      
+
 //       return "";
 //   }
 //     void update(){

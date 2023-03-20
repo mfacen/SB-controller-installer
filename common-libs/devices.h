@@ -21,12 +21,12 @@ public:
   String getHtml()
   {
     return "<div class=' card '><h4>" + 
-    name + "</h4><fieldset>" + 
+    name + "</h4>" + 
     onoffswitch->getHtml() +
      "<div class='card'>" + 
      bombaTimer->getHtml() + 
      valvulaPanel->getHtml() + 
-     "</div></fieldset></div>";
+     "</div></div>";
   }
   String postCallBack(ElementsHtml *e, String postValue)
   {
@@ -113,17 +113,17 @@ public:
 
   String getHtml()
   {
-    return "<div class=' card '><h4>" + name + "</h4><fieldset>" +
-           weight->getHtml() + " gr<br>" +
-           interval->getHtml() + " h<br>" +
-           rate->getHtml() + " gr/s<br>" +
-           servings->getHtml() + " u<br>" +
-           airTime->getHtml() + " s<br>" +
-           btnStart->getHtml() +"<br>"+
-           btnReset->getHtml() +"<br>"+
+    return "<div class=' card '><h4>" + name + "</h4><span>" +
+           weight->getHtml() + " gr</span><span>" +
+           interval->getHtml() + " h</span><span>" +
+           rate->getHtml() + " gr/s</span><span>" +
+           servings->getHtml() + " n</span><span>" +
+           airTime->getHtml() + " s</span>" +
+           btnStart->getHtml() +
+           btnReset->getHtml() +
            info->getHtml() +
            "<div class='row'>"+air->getHtml() +
-           feed->getHtml() + blower->getHtml() + "</div></fieldset>"+
+           feed->getHtml() + blower->getHtml() + "</div>"+
            "</div>";
   }
 
@@ -213,8 +213,8 @@ public:
 
     air->update();
     feed->update();
-    info->update("State:" + String(state->value) + " <br>Feeds Left:" + String(feedNumber->value ) +
-                 "<br>Dispensed: " + String(dispensed->value) + " <br>FeedTime: " + feedTime->text + "<br>" +
+    info->update("State:" + String(state->value) + " Feeds Left:" + String(feedNumber->value ) +
+                 "<br>Dispensed: " + String(dispensed->value) + " FeedTime: " + feedTime->text + "<br>" +
                  "Iddle Time: " + String(iddleTime->value) + "<br>");
   }
 
@@ -333,16 +333,16 @@ public:
   }
   String getHtml()
   {
-    String s = "<div class=' card '><h4>" + String(name) + "</h4><fieldset>";
+    String s = "<div class=' card '><h4>" + String(name) + "</h4>";
     s += pressure->getHtml();
     s += edtSetting->getHtml();
     s += speedCtrlPanel->getHtml();
-    s += "VFD Type: "+cmbVFD_Type->getHtml();
+    s += cmbVFD_Type->getHtml();
     //s += PID_GUI->getHtml();
     s += tmrVenturi->getHtml();
     //s += oxigen->getHtml();
     // s+=edtMinOxy->getHtml();
-    s += "</fieldset></div>";
+    s += "</div>";
     return s;
   }
   void update()
@@ -430,10 +430,12 @@ public:
     edtSet = new SavedEdit("Setpoint", id + "Set", "/status.sta", "number");
     pwm = new PWM(60000, relay);
     set = new Set("relay", "rly", relay);
-    myPID = new PID(&input, &output, &setpoint, .5, .0005, .5, DIRECT);
+    //myPID = new PID(&input, &output, &setpoint, .5, .0005, .5, DIRECT);
+    myPID = new PID(&input, &output, &setpoint, 100, 0, 0, DIRECT);
     pid_module = new PID_Module("pid", myPID);
     logger = _logger;
     panOut = new GenericOutputPanel ("Output",id+ "pnlOut", "%");
+    panelTemp = new GenericInputPanel (id+ "pnlOut", "C",tempProbe,true,false,this);
   }
   void loop(){
     myPID->Compute();
@@ -446,8 +448,12 @@ public:
       myPID->SetOutputLimits(0, 60);
       edtSet->update();
       pid_module->updateTuning();
+      logger->addInput(panelTemp);
+      logger->addInput(pid_module);
+      firstRun = false;
     }
-    tempProbe->update();
+    
+    panelTemp->update();
     pwm->update();
     input = tempProbe->value;
     setpoint = edtSet->value;
@@ -465,12 +471,13 @@ public:
   }
   String getHtml()
   {
-    String s = "<div class='card'><h4>" + name + "<h4><fieldset>";
+    String s = "<div class=''><h4>" + name + "<h4>";
+    s += panelTemp->getHtml();
     s += set->getHtml();
     s += edtSet->getHtml();
     s+= panOut->getHtml();
     s += pid_module->getHtml();
-    s += "</fieldset></div>";
+    s += "</div>";
     return s;
   }
 
@@ -479,6 +486,7 @@ private:
   Dsb18B20 *tempProbe;
   SavedEdit *edtSet;
   GenericOutputPanel *panOut;
+  GenericInputPanel *panelTemp;
   GenericEditPanel *edtSeting;
   PWM *pwm;
   Set *set;

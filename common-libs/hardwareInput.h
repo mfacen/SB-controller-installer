@@ -131,21 +131,6 @@ class Modbus_Device: public HardwareInput {
     };
     
     }
-  static bool compareValue(int _id,float _val){
-    for (unsigned int i = 0; i < list.size(); i++)
-    {
-      if (list[i]->getSlaveId() == _id){
-         if (list[i]->value==_val) {
-           return true;
-         }
-      else {
-        list[i]->update(_val);
-        Serial.println("Modbus discrepancy device number " + String(_id));
-        //saveLog("Modbus discrepancy device number " + String(_id));
-         };
-      }
-    }
-  }
   private:
     String id;
     int slaveID;
@@ -469,8 +454,8 @@ class Dsb18b20a : public HardwareInput{
     tempSensors->setWaitForConversion(false);     //  dont block the program while the temperature sensor is reading
     tempSensors->begin();
     sensor_number = _sensor_number; 
- }
- void update()
+    }
+  void update()
   {
     if (!tempRequested)
     {
@@ -502,8 +487,7 @@ protected:
     bool tempRequested = false;
   unsigned long lastTemperatureRequest;
   int intervalTemperature = 1500;
-    int sensor_number = 0;
-
+  int sensor_number = 0;
 };
 
 

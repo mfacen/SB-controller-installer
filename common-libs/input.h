@@ -241,12 +241,7 @@ public:
       s += F("' id='");
       s += id;
       s += F("' value='");
-      if (type=="time")
-          {s += text.substring(0,2)+":"+text.substring(3,5);//+":00";
-          //Serial.println(text+"  -- "+text.substring(0,2)+":"+text.substring(3,5)+":00");
-          }
-      else
-          s += text;
+      s += text;
       s += F("' onchange=\"btnClickText('");
       s += id;
       // if (type == "checkbox") {
@@ -312,6 +307,7 @@ public:
       value = text.toFloat();
       if (text == "true")
         value = 1;
+      lastValue = text;
       //Serial.println(value);
       
       if (type == "checkbox")
@@ -320,10 +316,8 @@ public:
       }
       else
       {
-        javaQueue.addJsonInner(id,"value="+text+((type=="time")?":00":""));
-        //if (type=="time")Serial.println("Type time in EditBox::update() "+text);
+        javaQueue.addJsonInner(id,"value="+text);
       }
-      lastValue = text;
     }
   }
 
@@ -342,21 +336,20 @@ public:
   {
     name = n;
     id = _id;
-    variable = new SavedVariable(id);
     edit = new EditBox(id + "edt", "", _type, this);
     file = _file;
-    SavedVariable::add(variable); // STATIC adds this variable to the list so it can init() correctly
     parent = _parent;
+    nw = new char [id.length() + 1];
+    id.toCharArray(nw, sizeof(id));
+
   }
   String getHtml()
   {
     edit->setStyle(style );
-    variable->update();
-    edit->update(variable->text);
+    edit->update(preferences.getString(nw));
     String str;
     str +=name +" "+ edit->getHtml();
     return str;
-    //Serial.println("##############" + variable->text);
   }
   String postCallBack(ElementsHtml *e, String postValue)
   {
@@ -364,9 +357,8 @@ public:
     {
       if (postValue=="true") postValue = "1";
       if (postValue=="false") postValue ="0";
-      variable->update(postValue);
       value = postValue.toFloat();
-      //Serial.println(id+":"+postValue);
+      preferences.putString(nw,postValue);
 
     }
       if (parent)
@@ -378,53 +370,51 @@ public:
   {
     if (firstRun)
     {
-      //variable->update();
-      text = variable->text;
-      value = variable->value;
-      //Serial.print("First Run Update Edit "+name+" = ");
-      //Serial.println(variable->value);
+      text=preferences.getString(nw);
+        value = text.toFloat();
+
+      Serial.print("First Run Update Edit "+name+" = ");
+      Serial.println(text+" "+String(preferences.freeEntries()));
       firstRun = false;
     }
-    edit->update(variable->text);
-    value = variable->value;
-    text = variable->text;
-      //Serial.println(id+":"+String(value));
-
+    edit->update(text);
   }
-  String getText (){return variable->text;}
+  String getText (){return String(value);}
   void update(String s)
   {
-    variable->update(s);
-    text = s;
-    value = variable->value;
+    preferences.putString(nw,s);
+    edit->update(s);
+    value = s.toFloat();
+    text=s;
   }
   void update(float f)
   {
-    variable->update(String(f));
     edit->update(f);
-    value = variable->value;
-    text=variable->text;
+    value = f;
+    preferences.putString(nw,String(f));
+    text=String(f);
   }
 
-  static std::vector<SavedEdit *> list; // esta lista estatica la he creado para hacerles init() a todas las
-  static void updateAll()
-  {
-    for (auto *s : list)
-    {
-      s->update();
-    }
-  } //  variables que he creado.
-  static void add(SavedEdit *var)
-  {
-    list.push_back(var);
-  }
+  // static std::vector<SavedEdit *> list; // esta lista estatica la he creado para hacerles init() a todas las
+  // static void updateAll()
+  // {
+  //   for (auto *s : list)
+  //   {
+  //     s->update();
+  //   }
+  // } //  variables que he creado.
+  // static void add(SavedEdit *var)
+  // {
+  //   list.push_back(var);
+  // }
 
 private:
+  char *nw;
   EditBox *edit;
   String file;
-  SavedVariable *variable;
   String text;
 };
+//std::vector<SavedEdit *> SavedEdit::list;
 
 // ########################################
 //  Combo Box HTML
@@ -442,7 +432,7 @@ public:
     fieldsCount = s;
     value = 0;
     savedVariable = new SavedVariable (id);
-    SavedVariable::add(savedVariable); // STATIC adds this variable to the list so it can init() correctly
+    //SavedVariable::add(savedVariable); // STATIC adds this variable to the list so it can init() correctly
 
     if (e != 0)
       parent = e; // ERROR ERROR ERROR ERROR NO HACER ESTO /Serial.println (t);
@@ -592,6 +582,7 @@ class Dsb18B20 : public HardwareInput
 {
 public:
   int pin;
+  unsigned long lastSuccesfulReading;
   static DallasTemperature *tempSensors;
   static OneWire *oneWire;
    static bool tempRequested;
@@ -602,6 +593,8 @@ static void initSensors(int pin){
     tempSensors = new DallasTemperature(oneWire); // Create an instance of the temperature sensor class
     tempSensors->setWaitForConversion(false);     //  dont block the program while the temperature sensor is reading
     tempSensors->begin();
+    Serial.println("Found "+String(tempSensors->getDeviceCount())+" dsb18b20.");
+
 }
 static float updateSensors( int device_number){
     if (!tempRequested)
@@ -613,7 +606,7 @@ static float updateSensors( int device_number){
     }
     if ((millis() - lastTemperatureRequest > intervalTemperature) && tempRequested)
     {
-      //Serial.println(tempSensors->getDeviceCount());
+    //Serial.println("Found "+String(tempSensors->getDeviceCount())+" dsb18b20.");
       tempRequested = false;
        return tempSensors->getTempCByIndex(device_number); // Get the temperature from the sensor
       
@@ -632,13 +625,17 @@ static float updateSensors( int device_number){
     pinMode(pin, INPUT_PULLUP);
     device_number = _device_number;
     Dsb18B20::initSensors(pin);
+    value=-1;
   }
   //~Dsb18B20(ElementsHtml::deleteElement(this));
 
 
   void update()
   {
-     value = Dsb18B20::updateSensors(device_number);
+    float reading = Dsb18B20::updateSensors(device_number);
+    //Serial.printf("temp: ",reading);
+     if (reading>-200) {value =reading;lastValue=value;lastSuccesfulReading = millis();}
+     else if ( millis() - lastSuccesfulReading > 10000 ) value=reading;//lastValue ;
      // Serial.println("Requesting device number"+String (value));
   }
   float getTempAndBlock()
@@ -650,7 +647,7 @@ static float updateSensors( int device_number){
   }
   void setDeviceNumber(int n){device_number = n;}
 private:
-
+  float lastValue=-1;
   int device_number = 0;
 };
 DallasTemperature *Dsb18B20::tempSensors;
@@ -668,14 +665,11 @@ public:
   {
     id = _id;
     child = e;
-    btnCalLow = new ButtonPrompt((child->id + ("btnLow")).c_str(), "Low", this);
-    btnCalHigh = new ButtonPrompt(child->id + "btnHigh", "High", this);
-    btnResetCal = new Button(child->id + "btnReset", "Reset", this);
+    btnCalLow = new ButtonPrompt((child->id + ("btnLow")).c_str(), "Cal Low", this);
+    btnCalHigh = new ButtonPrompt(child->id + "btnHigh", "Cal High", this);
+    btnResetCal = new Button(child->id + "btnReset", "Reset Cal", this);
   }
-  String getHtml() { 
-    return "<fieldset >Calibration<br>"+btnCalHigh->getHtml() +"<br>"+
-     btnCalLow->getHtml()+"<br>"+
-     btnResetCal->getHtml()+"</fieldset>"; }
+  String getHtml() { return btnCalHigh->getHtml() + btnCalLow->getHtml()+btnResetCal->getHtml(); }
 
   void init(float newData)
   {
@@ -945,11 +939,11 @@ public:
   }
   String getHtml()
   {
-    return "<div class='card'><h4>" + name + "</h4><fieldset class='card'>"+
+    return "<div class='card'><h4>" + name + "</h4>"+
     chkState->getHtml()+chkMode->getHtml()+"Time Schedule" +
              edt_Shedule->getHtml() + edt_OnTime->getHtml() + edt_OffTime->getHtml()+
              "<br>Status: "+label->getHtml() +
-             "</fieldset></div>";
+             "</div>";
 
   }
   void update()
@@ -971,7 +965,7 @@ public:
     }
     if (running)
     {
-      if (!chkMode->value) {     //  MODE TIMER 
+      if (!chkMode->value) {     //  MODE SCHEDULE 
           
           if ((millis() - lastCheck) > (((strTime->text.substring(index, strTime->text.indexOf('-', index)))).toInt()-1) * 1000)
           {
@@ -987,8 +981,7 @@ public:
             //   output->update(0);
             // if (id== "csbmbedt")
              Serial.println("index: "+String(index)+" text: "+((strTime->text.substring(index,strTime->text.indexOf('-',index))).toInt()) +
-                              " Check OnOff: "+String(chkState->value)+
-                             " value: "+String(value) +"  Running= "+String(running));
+                             " value: "+String(value));
             lastCheck = millis();
           }
       }
@@ -996,21 +989,18 @@ public:
             bool reversed=false;
            int onTime = String(edt_OnTime->getText().substring(0,2)+edt_OnTime->getText().substring(3,5)).toInt();
            int offTime = String(edt_OffTime->getText().substring(0,2)+edt_OffTime->getText().substring(3,5)).toInt();
-           time_t localTime = now()-LOCAL_TIME_OFFSET*3600;
-           //Serial.println (String(hour(localTime))+":"+String(minute(localTime)));
-           int nowTime = String(String(hour(localTime))+(minute(localTime)<10?"0":"")+String(minute(localTime))).toInt();
+           int nowTime = String(String(hour())+(minute()<10?"0":"")+String(minute())).toInt();
            reversed = (onTime > offTime); // in case onTime < offTime
-              //Serial.println("TIMER ON:"+String(onTime)+"-"+String(offTime)+"-"+String(nowTime));
-
+              //Serial.println(edt_OnTime->getText());
           if (timeStatus() == timeSet) {
-            if (( nowTime>=onTime) &&  (nowTime<offTime) )
+            if (( nowTime>onTime) &&  (nowTime<=offTime) )
                 {
                 output->update(!reversed); value = !reversed;
                 //Serial.println("true");
               }
               else {
                 output->update(reversed); value = reversed;
-                     //Serial.println("false");
+                   //           Serial.println("false");
 
               }
           }
@@ -1044,9 +1034,8 @@ public:
     if (e == chkState)
     {
       Serial.println(postValue);
-      if (postValue=="1") {running = true; lastCheck = millis();    Serial.println("Running = TRUE");
-      }
-      else {stop();lastCheck=millis();}
+      if (postValue=="1") {running = true; lastCheck = millis();}
+      else {stop();}
     }
     if (e==chkMode){
       lastCheck=millis();
@@ -1058,6 +1047,7 @@ public:
   {
     running = true;
     index=0;
+    //value = 1;
   }
   void stop()
   {
@@ -1067,8 +1057,7 @@ public:
     index=0;
   }
   void update(float f)
-  { 
-    output->lastValue=-1;
+  {
     output->update(f);
     value = f;
   }
@@ -1177,6 +1166,7 @@ public:
     if (e==btnID){
       columnName->update(postValue);
       id = columnName->text;
+      name = id;
     }
     return "";
   }
@@ -1425,6 +1415,7 @@ class PID_Module : public ElementsHtml {
   public:
     PID_Module ( String _id,PID *_pid  ){
       id = _id;
+      name = _id;
       pid = _pid;
       edtP = new SavedEdit ( "kP",id + "edtP","/status.sta","number",this);
       edtI = new SavedEdit ( "kI",id + "edtI","/status.sta","number",this);
@@ -1445,6 +1436,7 @@ class PID_Module : public ElementsHtml {
      //consoleLog(id,String(pid->GetKp(),4));
      //consoleLog(id,String(pid->GetKi(),4));
      //consoleLog(id,String(pid->GetKd(),4));
+     
    }
    void setPidParameters (){}
    void setP (double p){ edtP->update(p); updateTuning();}

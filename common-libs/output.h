@@ -11,7 +11,6 @@ class HardwareOutput
 public:
   float factor = 1;
   float value;
-  float lastValue;
   //String id;
   virtual void update();
   virtual void update(float f);
@@ -482,48 +481,27 @@ class ModbusRelay: public HardwareOutput{
    ModbusRelay(int _slaveID, int _relayNumber) { 
      gSlaveID = _slaveID;
      relayNumber = _relayNumber;
-     list.push_back(this);
    }
     void update(){
       #ifdef ESP32
       if (lastValue != value ){
-      unsigned long tmr = millis();
+      //unsigned long tmr = millis();
       //Serial.println("Writing to Modbus Relay "+String(relayNumber));
       //nodeRelays.writeSingleRegister(relayNumber,(value?0x0100:0x0200), gSlaveID );
-          modbus.writeSingleHoldingRegister(gSlaveID,relayNumber,(value?0x0100:0x0200));
+                  modbus.writeSingleHoldingRegister(gSlaveID,relayNumber,(value?0x0100:0x0200));
 
       //Serial.println("Elapsed time for RS485 com to RelayBard: "+String(millis()-tmr));
       lastValue = value;
       }
-      if ( millis() > lastSanityCheck + 15000 ) {requestData(gSlaveID);lastSanityCheck=millis();}
       #endif
     }
     void update (float v){value=v;update();}
-  
-    static void requestData(int _slaveID){
-      modbus.readHoldingRegisters(_slaveID,1,16);
-      //Serial.println("Sending Relay Data Request");
-    }
-    static void checkData(uint8_t* data){
-      //Serial.println("Checking for Modbus Relay discrepancies");
-          for (unsigned int i = 0; i < list.size(); i++){
-             if ( data[(list[i]->relayNumber-1) * 2  + 1  ] != list[i]->value) {  // si es igual hay discrepancia ya que en la respuesta 0=ON
-                list[i]->lastValue=-1;list[i]->update(list[i]->value);
-                Serial.println("Discrepancia en  Relay numero "+String(list[i]->relayNumber));
-                //saveLog("Discrepancia en  Relay numero "+String(list[i]->relayNumber));
-             };
-
-          }
-
-    }
   private:
+    float lastValue = -1;
     int relayNumber;
     int gSlaveID;
-    static std::vector <ModbusRelay*> list;
-    static unsigned long lastSanityCheck;
 };
-std::vector<ModbusRelay *> ModbusRelay::list;
-unsigned long ModbusRelay::lastSanityCheck;
+
 // ########################################
 //  Modbus VFD
 // ########################################

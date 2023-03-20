@@ -157,24 +157,25 @@ void startUpWifi()
   // Modbus communication runs at 9600 baud
   #ifdef ESP32
   SerialInterface.begin(9600);
-  modbus.onData( []  // lambda
-            (uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
-    // Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
-    // for (size_t i = 0; i < length; ++i) {
-    //   Serial.printf("N: %02x : %02x   :",i, data[i]);
-    //   if (i%2) Serial.printf("\n");
-    // Serial.printf("\nval received on Modbus: %.2f", *reinterpret_cast<float*>(data));
-    // Serial.print("\n\n");
-
-    if ( fc == esp32Modbus::READ_HOLD_REGISTER ) {
-        ModbusRelay::checkData(data);
+  modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
+    Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
+    for (size_t i = 0; i < length; ++i) {
+      Serial.printf("%02x", data[i]);
     }
+    std::reverse(data, data + 4);  // fix endianness
+    Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
+    Serial.print("\n\n");
+
+    Modbus_Device::checkSlaveIDs (serverAddress,data[0]);
   });
   modbus.onError([](esp32Modbus::Error error) {
     Serial.printf("Modbus error: 0x%02x\n\n", static_cast<uint8_t>(error));
   });
   modbus.begin();modbus.setTimeOutValue(1000);
   #endif
+    preferences.begin("myApp", false);
+
+   Serial.println( "Preferences Fee Entries: "+String(preferences.freeEntries()));
 }
 void printJavaQueue(Page page)
 {
@@ -356,7 +357,6 @@ void generalLoop()
             else logger.sendMqtt();
         }
         Serial.println("\033[39m");
-
     } // Para usar en modo AP sacar el wifi_ssid de los Settings
 }
 
@@ -662,7 +662,7 @@ void startServer()
 ///////////////////////////////////////////////////////
 void handleIndex()
 {
-    // server.send(200,"text/html","/index.html");
+    // server.send(400,"text/html",page.getHtmlString());
 }
 void handleWifiManager()
 {
@@ -694,6 +694,10 @@ void handleDebug()
 void handleGetJavaScript()
 {
     server.send(200, "text/html", ElementsHtml::javaQueue.getJson());
+}
+void handleGetStatus()
+{
+    //server.send(200, "text/html", SavedVariable::);
 }
 ///////////////////////////////////////////////////////////////////////
 //////////////   HANDLE BUTTON CLICK   ///////////////////////////////                    BUTTON CLICK
@@ -947,10 +951,8 @@ void handleFileList()
                 Serial.println("handleFileRead: " + path);
                 if (path.endsWith("/"))
                     path += "index.html"; // If a folder is requested, send the index file
-                if (path == "/index.html"){
+                if (path == "/index.html")
                     page.getHtml();
-                    Serial.println("Index Updated");
-                }
                 String contentType = getContentType(path); // Get the MIME type
                 String pathWithGz = path + ".gz";
                 if (FILE_SYS.exists(pathWithGz) || FILE_SYS.exists(path))
