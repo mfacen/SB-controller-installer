@@ -102,7 +102,6 @@ void setup()
     // Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
     // Serial.print("\n\n");
   //});
-    SavedVariable::init();
     spdInf.setVfd(&spdInfCtrl);
     spdSup.setVfd(&spdSupCtrl);
     
