@@ -1,5 +1,5 @@
 
-#include "../common-libs/header.h"
+#include <header.h>
 
 #define DEVICE_NAME "relayBoardIn"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "2.01"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -36,7 +36,7 @@ Clarificador clarificadorSup("Clarificador Sup", "cs", &bombaClarSup, &evClarSup
 Clarificador clarificadorInf("Clarificador Inf", "ci", &bombaClarInf, &evClarInf, &logger);
 
 
-#include "../common-libs/footer.h"
+#include <footer.h>
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");

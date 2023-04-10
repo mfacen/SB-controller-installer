@@ -1,5 +1,5 @@
 
-#include "../common-libs/header.h"
+#include <../common-libs/header.h>
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "2.187"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -77,7 +77,7 @@ FakeOutput alrmInf;
 FakeOutput alrmSup;
 Set alarmSup ( "Alarm Sup","aS",&alrmSup);
 Set alarmInf ( "Alarm Inf","aI",&alrmInf);
-#include "../common-libs/footer.h"
+#include <../common-libs/footer.h>
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");
