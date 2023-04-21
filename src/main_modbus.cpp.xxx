@@ -149,7 +149,7 @@ void setup()
     page.addString("</div>");
     page.addElement(&logger);
     //page.addString("</div>");
-    // page.addElement(&graphic);
+    page.addElement(&dirCapture);
     page.addString("<br>");
     page.addElement(&lblVersion);
     page.addString("<br>");

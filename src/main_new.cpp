@@ -8,6 +8,7 @@ const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
 Page page("Shrimpbox Main Controller", "User interface");
 Updater updater(DEVICE_NAME, SOFT_VERSION);
+
 //Alarm alarma;
 TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
@@ -60,8 +61,8 @@ Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
 
 //Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
 //Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
-NewFeeder feederSup ("Feeder Sup","fdr_sp",&RelayFeederAirSup,&logger);
-NewFeeder feederInf ("Feeder Inf","fdr_if",&RelayFeederAirInf,&logger);
+NewFeeder feederSup ("Feeder_Sup","fdrSup",&RelayFeederAirSup,&logger);
+NewFeeder feederInf ("Feeder_Inf","fdrInf",&RelayFeederAirInf,&logger);
 
 GenericTimer residuosSup("Residuos_Sup", "rs", &relayResiduosSup);
 GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
@@ -74,13 +75,13 @@ Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf
 
 //Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 //Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
-GenericInputPanel spdSup("Pressure Sup","Bar",&pressureSensorSup,true,false);
-GenericInputPanel spdInf("Pressure Inf","Bar",&pressureSensorInf,true,false);
+GenericInputPanel spdSup("Pressure_Sup","Bar",&pressureSensorSup,true,false);
+GenericInputPanel spdInf("Pressure_Inf","Bar",&pressureSensorInf,true,false);
 
 FakeOutput alrmInf;
 FakeOutput alrmSup;
-Set alarmSup ( "Alarm Sup","aS",&alrmSup);
-Set alarmInf ( "Alarm Inf","aI",&alrmInf);
+Set alarmSup ( "Alarm_Sup","aS",&alrmSup);
+Set alarmInf ( "Alarm_Inf","aI",&alrmInf);
 #include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
@@ -149,7 +150,7 @@ void setup()
     page.addString("</div>");
     page.addElement(&logger);
     //page.addString("</div>");
-    // page.addElement(&graphic);
+     page.addElement(&dirCapture);
     page.addString("<br>");
     page.addElement(&lblVersion);
     page.addString("<br>");
