@@ -75,8 +75,8 @@ Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf
 
 //Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 //Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
-GenericInputPanel spdSup("Pressure_Sup","Bar",&pressureSensorSup,true,false);
-GenericInputPanel spdInf("Pressure_Inf","Bar",&pressureSensorInf,true,false);
+GenericInputPanel spdSup("spd_infmbar","Bar",&pressureSensorSup,true,false);
+GenericInputPanel spdInf("spd_supmbar","Bar",&pressureSensorInf,true,false);
 
 FakeOutput alrmInf;
 FakeOutput alrmSup;
