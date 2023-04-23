@@ -75,8 +75,8 @@ Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf
 
 //Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 //Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
-GenericInputPanel spdSup("spd_infmbar","Bar",&pressureSensorSup,true,false);
-GenericInputPanel spdInf("spd_supmbar","Bar",&pressureSensorInf,true,false);
+GenericInputPanel spdSup("spd_infmbar","Bar",&pressureSensorSup,false,false);
+GenericInputPanel spdInf("spd_supmbar","Bar",&pressureSensorInf,false,false);
 
 FakeOutput alrmInf;
 FakeOutput alrmSup;
@@ -109,12 +109,14 @@ void setup()
   //});
   
     //Serial.println(spdInf.pressure->id);
+    feederInf.setExtraOutput(&RelayBlowerInf);
+    feederSup.setExtraOutput(&RelayBlowerSup);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
     logger.addInput(&lucesInf);
     logger.addInput(&lucesSup);
-    //logger.addInput(&clarificadorInf);
-    //logger.addInput(&clarificadorSup);
+    logger.addInput(&spdInf);
+    logger.addInput(&spdSup);
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
@@ -126,6 +128,7 @@ void setup()
     //page.addElement(&modbusIn);
     page.addString("<div class='card'>");
     page.addElement(&spdInf);
+    page.addElement(&alarmInf);
     page.addElement(&feederInf);
     page.addString("</div><div class='card'>");
     page.addElement(&residuosInf);
@@ -133,11 +136,11 @@ void setup()
     page.addElement(&lucesInf);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
-    page.addElement(&alarmInf);
     page.addString("</div>");
     page.addString("</div><h3>Tanque Superior</h3><div>");
     page.addString("<div class='card'>");
     page.addElement(&spdSup);
+    page.addElement(&alarmSup);
     page.addElement(&feederSup);
     page.addString("</div><div class='card'>");
     page.addElement(&residuosSup);
@@ -145,7 +148,6 @@ void setup()
     page.addElement(&lucesSup);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
-    page.addElement(&alarmSup);
     page.addString("</div>");
     page.addString("</div>");
     page.addElement(&logger);
@@ -185,5 +187,16 @@ void loop()
 
     if (millis() - lastCheck > 10000)
     {
+                   if (alarmInf.value) {
+                        if (spdInf.value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.value));
+                            lastAlarmInf = millis(); }
+              }
+              //mdLed.update();
+              if (alarmSup.value) {
+                        if (spdSup.value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
+                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.value));
+                            lastAlarmSup = millis();}
+              }
       }
 }
