@@ -1,5 +1,5 @@
 
-#include <../common-libs/header.h>
+#include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "2.187"        //   Changed file system to LittleFS   CHECAR LINEA 311
@@ -8,6 +8,7 @@ const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
 Page page("Shrimpbox Main Controller", "User interface");
 Updater updater(DEVICE_NAME, SOFT_VERSION);
+
 //Alarm alarma;
 TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
@@ -39,14 +40,14 @@ ModbusRelay RelayFeederAirInf(1,14);
 ModbusRelay RelayFeederFeedInf(1,15);
 ModbusRelay relayLucesInf(1,16);
 //BinaryOutput spdSupCtrl( 22, 24, 25) ;
-ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
-ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
+//ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
+//ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
 //ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
 //ModbusLed mdLed (4);
 //Modbus_Device anIn("AnalogIn",4);
 //GenericInputPanel modbusIn ("ModbusIN","",&anIn);
-Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
-Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
+//Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
+//Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
 //  y se va a referir a numeros del esp8266 a travez del modbus
 AnalogIn pressureSensorInf (36);
@@ -58,8 +59,10 @@ Set switchBlowerInf("Blower_Inf", "bli", &RelayBlowerInf);
 Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
 Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
 
-Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
-Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
+//Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
+//Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
+NewFeeder feederSup ("Feeder_Sup","fdrSup",&RelayFeederAirSup,&logger);
+NewFeeder feederInf ("Feeder_Inf","fdrInf",&RelayFeederAirInf,&logger);
 
 GenericTimer residuosSup("Residuos_Sup", "rs", &relayResiduosSup);
 GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
@@ -70,14 +73,16 @@ GenericTimer lucesInf("Luces_Inf", "li", &relayLucesInf);
 Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger);
 Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger);
 
-Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
-Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
+//Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
+//Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
+GenericInputPanel spdSup("spd_infmbar","Bar",&pressureSensorSup,false,false);
+GenericInputPanel spdInf("spd_supmbar","Bar",&pressureSensorInf,false,false);
 
 FakeOutput alrmInf;
 FakeOutput alrmSup;
-Set alarmSup ( "Alarm Sup","aS",&alrmSup);
-Set alarmInf ( "Alarm Inf","aI",&alrmInf);
-#include <../common-libs/footer.h>
+Set alarmSup ( "Alarm_Sup","aS",&alrmSup);
+Set alarmInf ( "Alarm_Inf","aI",&alrmInf);
+#include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
 // Graphic graphic("tempGraph");
@@ -102,18 +107,16 @@ void setup()
     // Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
     // Serial.print("\n\n");
   //});
-    spdInf.setVfd(&spdInfCtrl);
-    spdSup.setVfd(&spdSupCtrl);
-    
-    spdInf.init();
-    spdSup.init();
+  
     //Serial.println(spdInf.pressure->id);
+    feederInf.setExtraOutput(&RelayBlowerInf);
+    feederSup.setExtraOutput(&RelayBlowerSup);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
     logger.addInput(&lucesInf);
     logger.addInput(&lucesSup);
-    //logger.addInput(&clarificadorInf);
-    //logger.addInput(&clarificadorSup);
+    logger.addInput(&spdInf);
+    logger.addInput(&spdSup);
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
@@ -123,33 +126,33 @@ void setup()
                    "</p>"
                     "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
-   // page.addString("<div class=''>");
-    page.addElement(&spdInf);
     page.addString("<div class='card'>");
+    page.addElement(&spdInf);
+    page.addElement(&alarmInf);
+    page.addElement(&feederInf);
+    page.addString("</div><div class='card'>");
     page.addElement(&residuosInf);
     page.addElement(&skimmer_inf);
     page.addElement(&lucesInf);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
-    page.addElement(&alarmInf);
     page.addString("</div>");
-    //page.addString("</div><div class=''>");
-    page.addElement(&feederInf);
     page.addString("</div><h3>Tanque Superior</h3><div>");
-    page.addElement(&spdSup);
     page.addString("<div class='card'>");
+    page.addElement(&spdSup);
+    page.addElement(&alarmSup);
+    page.addElement(&feederSup);
+    page.addString("</div><div class='card'>");
     page.addElement(&residuosSup);
     page.addElement(&skimmer_sup);
     page.addElement(&lucesSup);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
-    page.addElement(&alarmSup);
     page.addString("</div>");
-    page.addElement(&feederSup);
     page.addString("</div>");
     page.addElement(&logger);
     //page.addString("</div>");
-    // page.addElement(&graphic);
+     page.addElement(&dirCapture);
     page.addString("<br>");
     page.addElement(&lblVersion);
     page.addString("<br>");
@@ -184,18 +187,16 @@ void loop()
 
     if (millis() - lastCheck > 10000)
     {
-              if (alarmInf.value) {
-                        if (spdInf.getPressure()->value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
+                   if (alarmInf.value) {
+                        if (spdInf.value<1200 && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
                             alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdInf.getId() + "%20Nivel:%20"+String (spdInf.value));
                             lastAlarmInf = millis(); }
               }
               //mdLed.update();
               if (alarmSup.value) {
-                        if (spdSup.getPressure()->value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
+                        if (spdSup.value<1200 && (millis()-lastAlarmSup>alarmInterval || lastAlarmSup==0)) {
                             alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+spdSup.getId() + "%20Nivel:%20"+String (spdSup.value));
                             lastAlarmSup = millis();}
               }
-              lastCheck = millis();
-              //ModbusRelay::requestData(1);
-    }
+      }
 }
