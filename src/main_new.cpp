@@ -26,7 +26,7 @@ ModbusRelay RelayBlowerSup(1,1);
 ModbusRelay relayResiduosSup(1,2);
 ModbusRelay bombaClarSup(1,3);
 ModbusRelay evClarSup(1,4);
-ModbusRelay SkmSup(1,5);
+//ModbusRelay SkmSup(1,5);
 ModbusRelay RelayFeederAirSup(1,6);
 ModbusRelay RelayFeederFeedSup(1,7);
 ModbusRelay relayLucesSup(1,8);
@@ -35,7 +35,7 @@ ModbusRelay RelayBlowerInf(1,9);
 ModbusRelay relayResiduosInf(1,10);
 ModbusRelay bombaClarInf(1,11);
 ModbusRelay evClarInf(1,12);
-ModbusRelay SkmInf(1,13);
+//ModbusRelay SkmInf(1,13);
 ModbusRelay RelayFeederAirInf(1,14);
 ModbusRelay RelayFeederFeedInf(1,15);
 ModbusRelay relayLucesInf(1,16);
@@ -56,8 +56,8 @@ AnalogIn pressureSensorSup (39);
 Set switchBlowerSup("Blower_Sup", "bls", &RelayBlowerSup);
 Set switchBlowerInf("Blower_Inf", "bli", &RelayBlowerInf);
 
-Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
-Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
+//Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
+//Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
 
 //Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
 //Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
@@ -109,7 +109,7 @@ void setup()
   //});
   
     //Serial.println(spdInf.pressure->id);
-    feederInf.setExtraOutput(&RelayBlowerInf);
+    feederInf.setExtraOutput(&RelayBlowerSup);
     feederSup.setExtraOutput(&RelayBlowerSup);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
@@ -132,7 +132,7 @@ void setup()
     page.addElement(&feederInf);
     page.addString("</div><div class='card'>");
     page.addElement(&residuosInf);
-    page.addElement(&skimmer_inf);
+    //page.addElement(&skimmer_inf);
     page.addElement(&lucesInf);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorInf);
@@ -144,7 +144,7 @@ void setup()
     page.addElement(&feederSup);
     page.addString("</div><div class='card'>");
     page.addElement(&residuosSup);
-    page.addElement(&skimmer_sup);
+    //page.addElement(&skimmer_sup);
     page.addElement(&lucesSup);
     page.addString("</div><div class='card'>");
     page.addElement(&clarificadorSup);
