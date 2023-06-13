@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.22"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.23"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -22,14 +22,14 @@ DirCapture dirCapture("dCapt", "/capturas");
 //ModbusLed ledModbus ( 1 );
 //ModbusRelay (1,1);
 //Set modLedSet ("Led","idLed",&ledModbus);
-ModbusRelay RelayBlowerSup(1,1);
-ModbusRelay relayResiduosSup(1,2);
-ModbusRelay bombaClarSup(1,3);
-ModbusRelay evClarSup(1,4);
-//ModbusRelay SkmSup(1,5);
-ModbusRelay RelayFeederAirSup(1,6);
-ModbusRelay RelayFeederFeedSup(1,7);
-ModbusRelay relayLucesSup(1,8);
+ModbusRelay RelayBlowerSup(1,8);
+ModbusRelay relayResiduosSup(1,7);
+ModbusRelay bombaClarSup(1,6);
+ModbusRelay evClarSup(1,5);
+//ModbusRelay SkmSup(1,4);
+ModbusRelay RelayFeederAirSup(1,3);
+ModbusRelay RelayFeederFeedSup(1,2);
+ModbusRelay relayLucesSup(1,1);
 
 ModbusRelay RelayBlowerInf(1,9);
 ModbusRelay relayResiduosInf(1,10);
@@ -167,6 +167,7 @@ void setup()
     page.getHtml(); // Generate the index.html File
     Serial.println("Generated index.html");
     updater.checkUpdate();
+    MapFile::saveLog("Start up unixTime= "+String(timeUNIX));
 }
 
 ///////////////////////////////////////////////////////////////////////////

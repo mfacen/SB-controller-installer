@@ -19,9 +19,6 @@
 	margin: .5em;
 	color: beige;
 	border-radius: .5em;
-	position: absolute;
-	top:0px;
-	right: 0px; 
 }
 body {
 	font-family: system-ui;
