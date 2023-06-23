@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.3"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.331"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -50,8 +50,8 @@ ModbusRelay relayLucesInf(1,16);
 //Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
 //  y se va a referir a numeros del esp8266 a travez del modbus
-AnalogIn pressureSensorInf (36);
-AnalogIn pressureSensorSup (39);
+AnalogIn pressureSensorInf (34);
+AnalogIn pressureSensorSup (35);
 
 Set switchBlowerSup("Blower_Sup", "bls", &RelayBlowerSup);
 Set switchBlowerInf("Blower_Inf", "bli", &RelayBlowerInf);
@@ -59,10 +59,10 @@ Set switchBlowerInf("Blower_Inf", "bli", &RelayBlowerInf);
 //Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
 //Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
 
-//Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
-//Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerInf, &logger);
-NewFeeder feederSup ("Feeder_Sup","fdrSup",&RelayFeederAirSup,&logger);
-NewFeeder feederInf ("Feeder_Inf","fdrInf",&RelayFeederAirInf,&logger);
+Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
+Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerSup, &logger);
+//NewFeeder feederSup ("Feeder_Sup","fdrSup",&RelayFeederAirSup,&logger);
+//NewFeeder feederInf ("Feeder_Inf","fdrInf",&RelayFeederAirInf,&logger);
 
 GenericTimer residuosSup("Residuos_Sup", "rs", &relayResiduosSup);
 GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
@@ -109,8 +109,8 @@ void setup()
   //});
   
     //Serial.println(spdInf.pressure->id);
-    feederInf.setExtraOutput(&RelayBlowerSup);
-    feederSup.setExtraOutput(&RelayBlowerSup);
+    //feederInf.setExtraOutput(&RelayBlowerSup);
+    //feederSup.setExtraOutput(&RelayBlowerSup);
     logger.addInput(&residuosInf);
     logger.addInput(&residuosSup);
     logger.addInput(&lucesInf);
