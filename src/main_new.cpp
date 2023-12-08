@@ -70,8 +70,8 @@ GenericTimer residuosInf("Residuos_Inf", "ri", &relayResiduosInf);
 GenericTimer lucesSup("Luces_Sup", "ls", &relayLucesSup);
 GenericTimer lucesInf("Luces_Inf", "li", &relayLucesInf);
 
-Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger);
-Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger);
+Clarificador clarificadorSup("Clarificador_Sup", "cs", &bombaClarSup, &evClarSup, &logger,&updater);
+Clarificador clarificadorInf("Clarificador_Inf", "ci", &bombaClarInf, &evClarInf, &logger,&updater);
 
 //Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 //Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
