@@ -82,6 +82,13 @@ FakeOutput alrmInf;
 FakeOutput alrmSup;
 Set alarmSup ( "Alarm_Sup","aS",&alrmSup);
 Set alarmInf ( "Alarm_Inf","aI",&alrmInf);
+
+//FlowMeter flowMeter(GPIO_NUM_5);
+//FlowMeter flowMeter1(GPIO_NUM_18);
+//DigitalIn flowMeter(GPIO_NUM_4,"Test");
+//GenericInputPanel flowMeterPanel("Flow Meter","L/min",&flowMeter,false,false);
+//GenericInputPanel flowMeterPanel1("Flow Meter1","L/min",&flowMeter1,false,false);
+
 #include "../common-libs/footer.h"
 
 // Button btnWifi("switchToStation","WiFi");
@@ -128,6 +135,8 @@ void setup()
                     "<h3>Tanque Inferior</h3><div>");
     //page.addElement(&modbusIn);
     page.addString("<div class='card'>");
+   // page.addElement(&flowMeterPanel);
+   // page.addElement(&flowMeterPanel1);
     page.addElement(&spdInf);
     page.addElement(&alarmInf);
     page.addElement(&feederInf);
