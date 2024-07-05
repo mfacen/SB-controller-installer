@@ -83,6 +83,9 @@ FakeOutput alrmSup;
 Set alarmSup ( "Alarm_Sup","aS",&alrmSup);
 Set alarmInf ( "Alarm_Inf","aI",&alrmInf);
 
+Digital_Alarm alarm32("a32",32, &alarma);
+
+
 //FlowMeter flowMeter(GPIO_NUM_5);
 //FlowMeter flowMeter1(GPIO_NUM_18);
 //DigitalIn flowMeter(GPIO_NUM_4,"Test");
@@ -133,7 +136,7 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Inferior</h3><div>");
-    //page.addElement(&modbusIn);
+    page.addElement(&alarm32);
     page.addString("<div class='card'>");
    // page.addElement(&flowMeterPanel);
    // page.addElement(&flowMeterPanel1);
