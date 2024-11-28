@@ -45,14 +45,14 @@ DigitalOutput R8(13,"D13");
 
 Set switch_drenaje("C1 Drain", "bls", &R1);
 Set switch_on("C1 Pump", "bli", &R2);
+GenericTimer bomba_c1("Bomba C1", "rs", &R3);
 
-//Set skimmer_sup("Skimmer_Sup", "skmSup", &SkmSup);
-//Set skimmer_inf("Skimmer_Inf", "skmInf", &SkmInf);
+Set skimmer_sup("Skimmer_izq", "skmSup", &R4);
+Set skimmer_inf("Skimmer_der", "skmInf", &R5);
 
 //Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
 //Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerSup, &logger);
 
-GenericTimer bomba_c1("Bomba C1", "rs", &R3);
 
 //Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
 //Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
@@ -113,6 +113,10 @@ void setup()
     page.addString("<div class='card'>");
    // page.addElement(&flowMeterPanel);
    // page.addElement(&flowMeterPanel1);
+    page.addElement(&switch_drenaje);
+    page.addElement(&switch_on);
+    page.addElement(&skimmer_inf);
+    page.addElement(&skimmer_sup);
     page.addElement(&bomba_c1);
     page.addElement(&alarmOn);
     page.addString("</div>");
