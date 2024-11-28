@@ -120,8 +120,8 @@ void setup()
     page.addElement(&bomba_c1);
     page.addElement(&alarmOn);
     page.addString("</div>");
-  
-
+    page.addElement(&logger);
+    page.addElement(&dirCapture);
     Serial.println("page.getHTML()");
 
     page.getHtml(); // Generate the index.html File
