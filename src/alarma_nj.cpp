@@ -48,7 +48,7 @@ void setup()
     page.addString("<p>"
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
-                    "<h3>Alarmas:</h3><div>");
+                    "<h3>Alarmas:</h3><div clas='card'>");
     page.addElement(&alarm32);
     page.addElement(&alarm33);
     page.addElement(&alarm25);
