@@ -43,13 +43,10 @@ DigitalOutput R8(13,"D13");
 //Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
 //  y se va a referir a numeros del esp8266 a travez del modbus
 
-Set switch_drenaje("C1 Drain", "bls", &R1);
-Set switch_on("C1 Pump", "bli", &R2);
-GenericTimer bomba_c1("Bomba C1", "rs", &R3);
-
-Set skimmer_sup("Skimmer_izq", "skmSup", &R4);
-Set skimmer_inf("Skimmer_der", "skmInf", &R5);
-
+GenericTimer  EV_Clarificador_izquierdo ("Clarificador_izquierdo","cli", &R2);
+GenericTimer  EV_Clarificador_derecho ("Clarificador_izquierdo","cld", &R4);
+GenericTimer  EV_Skimmers ("Clarificador_izquierdo","skm", &R3);
+Set bomba ("Bomba","bmb",&R1);
 //Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
 //Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerSup, &logger);
 
@@ -63,7 +60,6 @@ FakeOutput alrmInf;
 FakeOutput alrmSup;
 Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
 
-Digital_Alarm alarm32("a32",0, &alarma); // I can try alarm on IO0 is on the header already.
 
 
 //FlowMeter flowMeter(GPIO_NUM_5);
@@ -98,8 +94,6 @@ void setup()
     // Serial.print("\n\n");
   //});
   
-
-    logger.addInput(&bomba_c1);
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
@@ -109,16 +103,13 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Inferior</h3><div>");
-    page.addElement(&alarm32);
     page.addString("<div class='card'>");
    // page.addElement(&flowMeterPanel);
    // page.addElement(&flowMeterPanel1);
-    page.addElement(&switch_drenaje);
-    page.addElement(&switch_on);
-    page.addElement(&skimmer_inf);
-    page.addElement(&skimmer_sup);
-    page.addElement(&bomba_c1);
-    page.addElement(&alarmOn);
+    page.addElement(&EV_Clarificador_izquierdo);
+    page.addElement(&EV_Clarificador_derecho);
+    page.addElement(&EV_Skimmers);
+    page.addElement(&bomba);
     page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
@@ -143,13 +134,15 @@ int x=0;
 void loop()
 {
     generalLoop();
-
+    if ( EV_Clarificador_derecho.value == 1 || EV_Clarificador_izquierdo.value == 1 || EV_Skimmers.value == 1)
+    {
+        bomba.update(1);
+    }
+    else
+    {
+        bomba.update(0);
+    }
     if (millis() - lastCheck > 10000)
     {
-                   if (alarmOn.value) {
-                        if (digitalRead(0) && (millis()-lastAlarmInf>alarmInterval || lastAlarmInf==0)) {
-                            alarma.alarm(deviceID+"_ALARMA%20DE%20PRESION%20"+alarmOn.getName() + "%20Nivel:%20"+String (alarmOn.value));
-                            lastAlarmInf = millis(); }
-              }
       }
 }
