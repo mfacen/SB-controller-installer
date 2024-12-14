@@ -73,7 +73,7 @@ function evaluate(myObj) {
                 }
             else
             {
-                console.log("Falled trough in Javascript.js::evaluate() with Key "+key+" : "+myObj[key]);
+                //console.log("Falled trough in Javascript.js::evaluate() with Key "+key+" : "+myObj[key]);
                 document.getElementById(key).innerHTML = myObj[key];
             }
         }

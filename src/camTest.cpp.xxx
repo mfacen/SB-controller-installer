@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #include "esp_camera.h"
+
 #define TAG "TAG"
 //WROVER-KIT PIN Map
 #define CAM_PIN_PWDN    -1 //power down is not used
@@ -37,7 +39,7 @@ static camera_config_t camera_config = {
     .pin_href = CAM_PIN_HREF,
     .pin_pclk = CAM_PIN_PCLK,
 
-    .xclk_freq_hz = 20000000,//EXPERIMENTAL: Set to 16MHz on ESP32-S2 or ESP32-S3 to enable EDMA mode
+    .xclk_freq_hz = 16000000,//EXPERIMENTAL: Set to 16MHz on ESP32-S2 or ESP32-S3 to enable EDMA mode
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
@@ -86,5 +88,5 @@ void setup(){
 }
 void loop(){
     camera_capture();
-    //delay(1000);
+    delay(1000);
 }

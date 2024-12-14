@@ -1,14 +1,13 @@
 
 #include "../common-libs/header.h"
 
-#define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
+#define DEVICE_NAME "controller_nj"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
 #define SOFT_VERSION "2.4"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
 Page page("Shrimpbox Main Controller", "User interface");
 Updater updater(DEVICE_NAME, SOFT_VERSION);
-
 //Alarm alarma;
 TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
@@ -31,42 +30,14 @@ DigitalOutput R6(14,"D14");
 DigitalOutput R7(12,"D12");
 DigitalOutput R8(13,"D13");
 
-//BinaryOutput spdSupCtrl( 22, 24, 25) ;
-//ModbusVFD spdSupCtrl( 2 , VFD_Types::SOYAN_SVD) ;
-//ModbusVFD spdInfCtrl( 3 , VFD_Types::SOYAN_SVD) ;
-//ModbusVFD spdInfCtrl( 3 , VFD_Types::MOLLOM_B20) ;
-//ModbusLed mdLed (4);
-//Modbus_Device anIn("AnalogIn",4);
-//GenericInputPanel modbusIn ("ModbusIN","",&anIn);
-//Set vfdSup ("Venturi sup","vfdSup",&spdSupCtrl);
-//Set vfdInf ("Venturi inf","vfdInf",&spdInfCtrl);
-//Modbus_device pressureSensorSup (2,17); //17=A0 en esp8266 Aqui tengo que usar los numeros xQ estoy en ambiente esp32
-//  y se va a referir a numeros del esp8266 a travez del modbus
-
 GenericTimer  EV_Clarificador_izquierdo ("Clarificador_izquierdo","cli", &R2);
-GenericTimer  EV_Clarificador_derecho ("Clarificador_izquierdo","cld", &R4);
-GenericTimer  EV_Skimmers ("Clarificador_izquierdo","skm", &R3);
+GenericTimer  EV_Clarificador_derecho ("Clarificador_derecho","cld", &R4);
+GenericTimer  EV_Skimmers ("Skimmers","skm", &R3);
 Set bomba ("Bomba","bmb",&R1);
-//Feeder feederSup("Alimentador_Sup", "fdrSup", &RelayFeederAirSup, &RelayFeederFeedSup, &switchBlowerSup, &logger);
-//Feeder feederInf("Alimentador_Inf", "fdrInf", &RelayFeederAirInf, &RelayFeederFeedInf, &switchBlowerSup, &logger);
-
-
-//Speed_Control spdSup("Speed_Ctrl_Sup", "spd_sup",&spdSupCtrl,&pressureSensorSup, &logger);
-//Speed_Control spdInf("Speed_Ctrl_Inf", "spd_inf", &spdInfCtrl,&pressureSensorInf, &logger);
-//GenericInputPanel spdSup("venturi_sup","Bar",&pressureSensorSup,false,false);
-//GenericInputPanel spdInf("venturi_inf","Bar",&pressureSensorInf,false,false);
 
 FakeOutput alrmInf;
 FakeOutput alrmSup;
 Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
-
-
-
-//FlowMeter flowMeter(GPIO_NUM_5);
-//FlowMeter flowMeter1(GPIO_NUM_18);
-//DigitalIn flowMeter(GPIO_NUM_4,"Test");
-//GenericInputPanel flowMeterPanel("Flow Meter","L/min",&flowMeter,false,false);
-//GenericInputPanel flowMeterPanel1("Flow Meter1","L/min",&flowMeter1,false,false);
 
 #include "../common-libs/footer.h"
 
@@ -77,35 +48,24 @@ Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
 ///////              SETUP                                          ////////
 ////                                                               ////////
 ///////////////////////////////////////////////////////////////////////////
-
+void timerEvent(){
+    logger.logData();
+}
 void setup()
 {
     startUpWifi();
-    //Serial2.begin(115200, SERIAL_8N1, 16, 17);
-    SerialInterface.begin(9600, SERIAL_8N1, 16, 17);
-    //nodeRelays.begin(SerialInterface);
-    // modbus.onData([](uint8_t serverAddress, esp32Modbus::FunctionCode fc, uint16_t address, uint8_t* data, size_t length) {
-    // Serial.printf("id 0x%02x fc 0x%02x len %u: 0x", serverAddress, fc, length);
-    // for (size_t i = 0; i < length; ++i) {
-    //   Serial.printf("%02x", data[i]);
-    // }
-    // std::reverse(data, data + 4);  // fix endianness
-    // Serial.printf("\nval: %.2f", *reinterpret_cast<float*>(data));
-    // Serial.print("\n\n");
-  //});
-  
-    //Serial.println(spdInf.pressure->id);
+    EV_Clarificador_derecho.insertCallback(timerEvent);
+    EV_Clarificador_izquierdo.insertCallback(timerEvent);
+    EV_Skimmers.insertCallback(timerEvent);
+    logger.addInput(&EV_Clarificador_izquierdo);
+    logger.addInput(&EV_Clarificador_derecho);
+    logger.addInput(&EV_Skimmers);
     page.addElement(&lblTime);
-    //page.addElement(&vfdSup);
- 
-    //page.addElement(&vfdInf);
     page.addString("<p>"
-                   "<a href=/settings>Preferencias</a>"
+                   "<a href=/settings>Settings</a>"
                    "</p>"
-                    "<h3>Tanque Inferior</h3><div>");
-    page.addString("<div class='card'>");
-   // page.addElement(&flowMeterPanel);
-   // page.addElement(&flowMeterPanel1);
+                    "<h3>Main Panel</h3><div>");
+    page.addString("<div class='cardxx'>");
     page.addElement(&EV_Clarificador_izquierdo);
     page.addElement(&EV_Clarificador_derecho);
     page.addElement(&EV_Skimmers);
@@ -113,12 +73,15 @@ void setup()
     page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
+    page.addString("</div>");
+
     Serial.println("page.getHTML()");
 
     page.getHtml(); // Generate the index.html File
     Serial.println("Generated index.html");
     updater.checkUpdate();
     MapFile::saveLog("Start up unixTime= "+String(timeUNIX));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -134,15 +97,18 @@ int x=0;
 void loop()
 {
     generalLoop();
-    if ( EV_Clarificador_derecho.value == 1 || EV_Clarificador_izquierdo.value == 1 || EV_Skimmers.value == 1)
+    if (millis() - lastCheck > 100)
     {
-        bomba.update(1);
+
+        if ( EV_Clarificador_derecho.value == 1 || EV_Clarificador_izquierdo.value == 1 || EV_Skimmers.value == 1)
+        {
+            bomba.update(1);
+        }
+        else
+        {
+            bomba.update(0);
+        }
+        
+    lastCheck=millis();
     }
-    else
-    {
-        bomba.update(0);
-    }
-    if (millis() - lastCheck > 10000)
-    {
-      }
 }
