@@ -9,7 +9,7 @@ const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 Page page("Shrimpbox Main Controller", "User interface");
 Updater updater(DEVICE_NAME, SOFT_VERSION);
 //Alarm alarma;
-TelegramAlarm alarma;
+//TelegramAlarm alarma;
 TimeLabel lblTime("lblTime", "");
 LabelFreeHeap lblFreeHeap("lblHeap", "this");
 Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
@@ -34,7 +34,8 @@ GenericTimer  EV_Clarificador_izquierdo ("Clarificador_izquierdo","cli", &R2);
 GenericTimer  EV_Clarificador_derecho ("Clarificador_derecho","cld", &R4);
 GenericTimer  EV_Skimmers ("Skimmers","skm", &R3);
 Set bomba ("Bomba","bmb",&R1);
-
+//Dsb18b20a tempProbe(35);
+//GenericInputPanel tempPanel("tempI","C",&tempProbe);
 FakeOutput alrmInf;
 FakeOutput alrmSup;
 Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
@@ -70,6 +71,7 @@ void setup()
     page.addElement(&EV_Clarificador_derecho);
     page.addElement(&EV_Skimmers);
     page.addElement(&bomba);
+ //   page.addElement(&tempPanel);
     page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);

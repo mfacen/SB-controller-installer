@@ -11,6 +11,7 @@ Updater updater(DEVICE_NAME, SOFT_VERSION);
 
 //Alarm alarma;
 TelegramAlarm alarma;
+GSM_Module gsm("gsm");
 TimeLabel lblTime("lblTime", "");
 LabelFreeHeap lblFreeHeap("lblHeap", "this");
 Logger logger("Logger", "/dataLog.csv", 60, &wifiClient);
@@ -21,10 +22,10 @@ DirCapture dirCapture("dCapt", "/capturas");
 
 
 
-Digital_Alarm alarm32("a32",32, &alarma); // I can try alarm on IO0 is on the header already.
-Digital_Alarm alarm33("a33",33, &alarma);
-Digital_Alarm alarm25("a25",25, &alarma);
-Digital_Alarm alarm26("a26",26, &alarma);
+Digital_Alarm alarm32("a32",32, &alarma,&gsm); // I can try alarm on IO0 is on the header already.
+Digital_Alarm alarm33("a33",33, &alarma,&gsm);
+Digital_Alarm alarm25("a25",25, &alarma,&gsm);
+Digital_Alarm alarm26("a26",26, &alarma,&gsm);
 
 #include "../common-libs/footer.h"
 
@@ -53,6 +54,7 @@ void setup()
     page.addElement(&alarm33);
     page.addElement(&alarm25);
     page.addElement(&alarm26);
+    page.addElement(&gsm);
     page.addString("</div>");
     page.addElement(&logger);
     page.addElement(&dirCapture);
