@@ -40,7 +40,7 @@ void setup()
     startUpWifi();
     SerialInterface.begin(9600, SERIAL_8N1, 16, 17); // ??????
 
-
+    logger.addInput((gsm.pbSignal));
     //Serial.println(spdInf.pressure->id);
     page.addElement(&lblTime);
     //page.addElement(&vfdSup);
