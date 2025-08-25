@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "controller_nj"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.41"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.43"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -21,14 +21,14 @@ DirCapture dirCapture("dCapt", "/capturas");
 //ModbusLed ledModbus ( 1 );
 //ModbusRelay (1,1);
 //Set modLedSet ("Led","idLed",&ledModbus);
-DigitalOutput R1(32,"D32");
-DigitalOutput R2(33,"D33");
-DigitalOutput R3(25,"D25");
-DigitalOutput R4(26,"D26");
-DigitalOutput R5(27,"D27");
-DigitalOutput R6(14,"D14");
-DigitalOutput R7(12,"D12");
-DigitalOutput R8(13,"D13");
+DigitalOutput R1(32,"D32",true);
+DigitalOutput R2(33,"D33",true);
+DigitalOutput R3(25,"D25",true);
+DigitalOutput R4(26,"D26",true);
+DigitalOutput R5(27,"D27",true);
+DigitalOutput R6(14,"D14",true);
+DigitalOutput R7(12,"D12",true);
+DigitalOutput R8(13,"D13",true);
 
 GenericTimer  EV_Clarificador_izquierdo ("Clarificador_izquierdo","cli", &R2);
 GenericTimer  EV_Clarificador_derecho ("Clarificador_derecho","cld", &R4);
@@ -36,9 +36,9 @@ GenericTimer  EV_Skimmers ("Skimmers","skm", &R3);
 Set bomba ("Bomba","bmb",&R1);
 //Dsb18b20a tempProbe(35);
 //GenericInputPanel tempPanel("tempI","C",&tempProbe);
-FakeOutput alrmInf;
-FakeOutput alrmSup;
-Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
+//FakeOutput alrmInf;
+//FakeOutput alrmSup;
+//Set alarmOn ( "Alarm_Sup","aS",&alrmSup);
 
 #include "../common-libs/footer.h"
 
@@ -112,7 +112,14 @@ void loop()
             bomba.update(0);
             //digitalWrite(2, LOW);
         }
-        
+    // if (touchRead(14) < 50)
+    // {
+    //     Serial.println("Touch 14");
+    // }
+    // else
+    // {
+    //     //digitalWrite(4, LOW);
+    // }
     lastCheck=millis();
     }
 }

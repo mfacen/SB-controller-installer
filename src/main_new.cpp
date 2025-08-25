@@ -2,7 +2,7 @@
 #include "../common-libs/header.h"
 
 #define DEVICE_NAME "relayBoardModbus"   //  Aqui es importante define el nombre para los updates es el mismo para los dispositivos del mismo tipo
-#define SOFT_VERSION "2.4"        //   Changed file system to LittleFS   CHECAR LINEA 311
+#define SOFT_VERSION "2.36"        //   Changed file system to LittleFS   CHECAR LINEA 311
 String mdnsName = DEVICE_NAME;     // "basementController.local" no hace falta saber el IP
 const char *OTAName = DEVICE_NAME; // A name and a password for the OTA service
 
@@ -83,9 +83,6 @@ FakeOutput alrmSup;
 Set alarmSup ( "Alarm_Sup","aS",&alrmSup);
 Set alarmInf ( "Alarm_Inf","aI",&alrmInf);
 
-Digital_Alarm alarm32("a32",32, &alarma);
-
-
 //FlowMeter flowMeter(GPIO_NUM_5);
 //FlowMeter flowMeter1(GPIO_NUM_18);
 //DigitalIn flowMeter(GPIO_NUM_4,"Test");
@@ -136,7 +133,7 @@ void setup()
                    "<a href=/settings>Preferencias</a>"
                    "</p>"
                     "<h3>Tanque Inferior</h3><div>");
-    page.addElement(&alarm32);
+    //page.addElement(&modbusIn);
     page.addString("<div class='card'>");
    // page.addElement(&flowMeterPanel);
    // page.addElement(&flowMeterPanel1);
