@@ -1,7 +1,7 @@
 name,flexibox
 uploadInterval,600
 secondsCapture,180
-wifi_ssid,INFINITUM54AC
+wifi_ssid,INFINITUMCEAF
 wifi_pass,espantasuegras
 serverName,michelvm.eastus2.cloudapp.azure.com
 mqttServer,192.168.10.115
