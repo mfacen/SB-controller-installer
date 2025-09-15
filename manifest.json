@@ -1,7 +1,7 @@
 {
-  "name": "Firefly Unified Firmware",
-  "version": "1.6.3",
-  "home_assistant_domain": "firefly",
+  "name": "ShrimpBox Firmware",
+  "version": "2.45",
+  "home_assistant_domain": "ShrimpBox",
   "new_install_skip_erase": false,
   "builds": [
     {
@@ -10,14 +10,14 @@
         { "path": "esp32/bootloader.bin", "offset": 4096 },
         { "path": "esp32/partitions.bin", "offset": 32768 },
         { "path": "esp32/boot_app0.bin", "offset": 57344 },
-        { "path": "esp32/firefly.bin", "offset": 65536 },
+        { "path": "esp32/controller_nj.bin", "offset": 65536 },
         { "path": "esp32/spiffs.bin", "offset": 3211264 }
       ]
     },
     {
       "chipFamily": "ESP8266",
       "parts": [
-        { "path": "esp8266/firefly.bin", "offset": 0 },
+        { "path": "esp8266/firmware.bin", "offset": 0 },
         { "path": "esp8266/littlefs.bin", "offset": 3145728 }
       ]
     }
