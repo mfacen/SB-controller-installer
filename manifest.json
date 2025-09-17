@@ -11,7 +11,7 @@
         { "path": "esp32/partitions.bin", "offset": 32768 },
         { "path": "esp32/boot_app0.bin", "offset": 57344 },
         { "path": "esp32/controller_nj.bin", "offset": 65536 },
-        { "path": "esp32/spiffs.bin", "offset": 2686976 }
+        { "path": "esp32/spiffs.bin", "offset": 3211264 }
       ]
     },
     {
